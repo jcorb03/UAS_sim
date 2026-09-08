@@ -12,7 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(UAS_Sim
     src/main.cpp
     src/dynamics/UAS.cpp
-)
+    src/sensors/GPSSensor.cpp)
 
 target_include_directories(UAS_Sim
     PRIVATE
@@ -33,7 +33,7 @@ enable_testing()
 add_executable(UAS_tests
     tests/dynamics/test_UAS.cpp
     src/dynamics/UAS.cpp
-)
+ "include/uas_sim/sensors/GPSSensor.h" "src/sensors/GPSSensor.cpp")
 
 target_include_directories(UAS_tests
     PRIVATE
