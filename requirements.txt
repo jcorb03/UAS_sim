@@ -1,0 +1,55 @@
+
+UAS and simulation
+
+SR-01
+The system shall simulate the motion of a UAS in a two-dimensional horizontal environment.
+
+SR-02
+The UAS shall maintain a simulated position, velocity, heading and altitude.
+
+SR-03
+The UAS shall be capable of following a predefined sequence of mission waypoints.
+
+Sensors and estimation
+
+SR-04
+The system shall simulate noisy GPS position measurements.
+
+SR-05
+The system shall simulate noisy IMU measurements of acceleration and angular rate.
+
+SR-06
+The system shall estimate the UAS position, velocity and heading using measurements from the simulated sensors.
+
+SR-07
+The system shall provide an estimate of state uncertainty alongside the estimated state.
+
+Autonomy
+
+SR-08
+The UAS shall autonomously transition between mission states including waypoint navigation, surveillance, and return-to-base.
+
+SR-09
+The UAS shall detect a simulated object of interest using a simplified EO/IR-like sensor model based on range and field of view.
+
+SR-10
+Upon detecting an object of interest, the UAS shall autonomously alter its mission behaviour according to predefined decision logic.
+
+Communications
+
+SR-11
+The system shall simulate communication between the UAS and a ground station, including configurable latency and packet loss.
+
+SR-12
+The UAS shall maintain autonomous mission execution during temporary loss of communication with the ground station.
+
+Verification and experimentation
+
+SR-13
+The system shall record UAS truth state, sensor measurements, estimated state and mission events during simulation.
+
+SR-14
+The system shall calculate quantitative measures of navigation performance, including position estimation error.
+
+SR-15
+The system shall support repeatable experiments under different sensor and communication conditions.
