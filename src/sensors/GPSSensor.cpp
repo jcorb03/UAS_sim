@@ -37,6 +37,6 @@ void GPSSensor::update(double timestep, const UAS_state& uas_state)
   
 }
 
-GPS_measurement GPSSensor::getMeasurement() const {
+UAS_measurement GPSSensor::getMeasurement() const {
   return measurement_;
 }

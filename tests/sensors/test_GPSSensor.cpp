@@ -5,9 +5,9 @@ namespace UAS_tests {
   TEST(GPSSensorTests, ConstructorTest) {
 
     GPSSensor gps_sensor(1.0, 1.0, 10.0);
-    EXPECT_EQ(gps_sensor.getMeasurement().x, 0.0);
-    EXPECT_EQ(gps_sensor.getMeasurement().y, 0.0);
     EXPECT_EQ(gps_sensor.getMeasurement().time, -1.0);
+    EXPECT_FALSE(gps_sensor.getMeasurement().x.has_value());
+    EXPECT_FALSE(gps_sensor.getMeasurement().y.has_value());
   }
 
   TEST(GPSSensorTests, UpdateTest) {
@@ -15,10 +15,10 @@ namespace UAS_tests {
     GPSSensor gps_sensor(1.0, 1.0, 10.0);
     UAS_state state{ 10.0, 20.0, 5.0, 0.0 };
 
-    // Before the update period, the measurement should not change
+    // Before the update period, the measurement should be empty
     EXPECT_NO_THROW(gps_sensor.update(0.5, state));
     EXPECT_NEAR(gps_sensor.getMeasurement().time, -1.0, 1e-6);
-    EXPECT_NEAR(gps_sensor.getMeasurement().x, 0.0, 1e-6);
+    EXPECT_FALSE(gps_sensor.getMeasurement().x.has_value());
     EXPECT_EQ(gps_sensor.getMeasurement().valid, false);
 
     // After the update period, the measurement should update
@@ -30,7 +30,7 @@ namespace UAS_tests {
 
     EXPECT_NO_THROW(gps_sensor.update(0.7, state));
     EXPECT_NEAR(gps_sensor.getMeasurement().time, 2.2, 1e-6);
-    EXPECT_NEAR(gps_sensor.getMeasurement().x, 100, 5.0);
+    EXPECT_NEAR(gps_sensor.getMeasurement().x.value(), 100, 5.0);
 
   }
   
@@ -58,7 +58,7 @@ namespace UAS_tests {
     UAS_state state{ 10.0, 20.0, 5.0, 0.0 };
     gps_sensor.update(2.0, state);
 
-    EXPECT_NEAR(gps_sensor.getMeasurement().x, 10.0, 1e-8);
+    EXPECT_NEAR(gps_sensor.getMeasurement().x.value(), 10.0, 1e-8);
   }
 
   TEST(GPSSensorTests, TimeUntilDieTest) {

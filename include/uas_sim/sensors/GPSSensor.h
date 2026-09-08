@@ -1,20 +1,18 @@
 #pragma once
 #include "uas_sim/dynamics/UAS.h"
+#include "uas_sim/estimation/UAS_measurement.h"
 #include <random>
 #include <stdexcept>
 
-struct GPS_measurement {
-  double time, x, y;
-  bool valid = false;
-};
+
 class GPSSensor
 {
 public:
   GPSSensor(double noise_stddev, double update_period, double time_til_die);
   void update(double timestep, const UAS_state& uas_state);
-  GPS_measurement getMeasurement() const;
+  UAS_measurement getMeasurement() const;
 private:
-  GPS_measurement measurement_ = {-1, 0, 0};
+  UAS_measurement measurement_;
   double noise_stddev_;
   double update_period_;
   double time_since_measurement_ = 0.0;
