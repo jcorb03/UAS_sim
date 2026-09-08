@@ -5,7 +5,7 @@ SR-01
 The system shall simulate the motion of a UAS in a two-dimensional horizontal environment.
 
 SR-02
-The UAS shall maintain a simulated position, velocity, heading and altitude.
+The UAS shall maintain a simulated position, velocity, and heading.
 
 SR-03
 The UAS shall be capable of following a predefined sequence of mission waypoints.

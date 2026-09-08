@@ -21,3 +21,7 @@ void UAS::step(double timestep, UAS_command uas_command) {
 	state_.v = std::clamp((state_.v + accel * timestep), (operating_constraints_.min_speed), operating_constraints_.max_speed);
 
 }
+
+UAS_state UAS::getState() const {
+	return state_;
+}
