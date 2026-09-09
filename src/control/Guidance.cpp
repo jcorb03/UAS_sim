@@ -13,8 +13,9 @@ UAS_command GuidanceModule::getCommand(const UAS_state& current_state, const Way
   //heading calculated clockwise from north (y axis)
   double desired_heading = std::atan2(dx, dy);
   
-  
-
+  while (desired_heading < 0.0) {
+    desired_heading += 2 * std::numbers::pi;
+  }
   double desired_velocity = operating_constraints_.max_speed; // Example constant velocity
   
   // Create and return the UAS_command
