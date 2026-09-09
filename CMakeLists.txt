@@ -31,8 +31,7 @@ add_executable(UAS_Sim
     src/sensors/GPSSensor.cpp
     src/estimation/UASEstimator.cpp
     src/control/Guidance.cpp
-    src/Simulation.cpp
- )
+    src/Simulation.cpp)
 
 target_include_directories(UAS_Sim
     PRIVATE
@@ -55,7 +54,8 @@ add_executable(UAS_tests
     src/estimation/UASEstimator.cpp
     src/control/Guidance.cpp
     src/Simulation.cpp
-    tests/control/test_guidance.cpp)
+    tests/control/test_guidance.cpp 
+    tests/estimation/test_GPS_kalman.cpp)
 
 target_include_directories(UAS_tests
     PRIVATE
