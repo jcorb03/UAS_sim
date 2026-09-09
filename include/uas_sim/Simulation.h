@@ -12,7 +12,8 @@ class Simulation {
     Simulation(const UAS_operating_constraints& operating_constraints,
       const std::vector<Waypoint>& waypoints,
       UAS_state initial_state, GPSSensor gps_sensor);
-    void run(double sim_time, double timestep);
+    void run(double sim_length, double timestep);
+    bool getObjective(const UAS_state& state_estimate);
 
 private:
   // Guidance module Guidance;
@@ -23,4 +24,5 @@ private:
   GPSSensor gps_sensor_;
   std::vector<Waypoint> waypoints_;
   UAS_operating_constraints operating_constraints_;
+  double sim_time_ = 0;
 };

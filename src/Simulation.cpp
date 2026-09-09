@@ -9,7 +9,43 @@ Simulation::Simulation(const UAS_operating_constraints& operating_constraints,
   
 }
 
-void Simulation::run(double sim_time, double timestep) {
+void Simulation::run(double sim_length, double timestep) {
+  bool done = false;
+  while (sim_time_ < sim_length && done == false) {
+    done = getObjective(estimated_state_);
 
+    if (done == false) {
+      // Get Guidance Command - outputs desired state
+
+      // Dynamics + Control Step - outputs actual state
+      // 
+      // Get sensor measurements - outputs noisy measurements based on actual state
+      // 
+      // Estimate State 
+
+      sim_time_ += timestep;
+    }
+  }
 }
 
+bool Simulation::getObjective(const UAS_state& state_estimate) {
+
+  while (!waypoints_.empty()) {
+
+    Waypoint next_waypoint = waypoints_.front();
+
+    double dx = state_estimate.x - next_waypoint.x;
+    double dy = state_estimate.y - next_waypoint.y;
+
+    double euclid_distance = std::sqrt(dx * dx + dy * dy);
+
+    if (euclid_distance < 1e2) {
+      waypoints_.erase(waypoints_.begin());
+    }
+    else {
+      return false;
+    }
+  }
+
+  return true;
+}
