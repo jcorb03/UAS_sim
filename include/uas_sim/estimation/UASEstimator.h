@@ -1,35 +1,29 @@
 #pragma once
 #include "uas_sim/UAS_structs.h"
-#include <vector>
+#include <Eigen/Dense>
+#include <cmath>
 
 struct KalmanFilterState {
-  // State estimate
-  // x_hat
-  std::vector<double> state_estimate;
+  // State estimate: [x, y, velocity, heading]
+  Eigen::Vector4d state_estimate;
 
-  // State covariance
-  // P
-  std::vector<std::vector<double>> covariance;
+  // State covariance matrix
+  Eigen::Matrix4d P;
 
   // State transition matrix
-  // F
-  std::vector<std::vector<double>> state_transition;
+  Eigen::Matrix4d A;
 
-  // Process noise covariance
-  // Q
-  std::vector<std::vector<double>> process_noise;
+  // Process noise covariance matrix
+  Eigen::Matrix4d Q;
 
   // Measurement matrix
-  // H
-  std::vector<std::vector<double>> measurement_matrix;
+  Eigen::Matrix<double, 2, 4> H;
 
-  // Measurement noise covariance
-  // R
-  std::vector<std::vector<double>> measurement_noise;
+  // Measurement noise covariance matrix
+  Eigen::Matrix2d R;
 
   // Kalman gain
-  // K
-  std::vector<std::vector<double>> kalman_gain;
+  Eigen::Matrix<double, 4, 2> K;
 };
 
 
@@ -38,12 +32,12 @@ public:
   Estimator();
 
   void initialiseKalmanProperties(KalmanFilterState kalman);
-  void update(UAS_measurement& measurement, double sim_time);
+  void update(UAS_measurement& measurement, double sim_time, bool gps_update);
 
   UAS_state get_state_estimate() const;
 
 private:
-  int time_ = 0.0;
+  double time_ = 0.0;
   int measurement_count_;
   UAS_state estimated_state_;
   UAS_measurement measurement_;

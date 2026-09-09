@@ -26,7 +26,8 @@ namespace UAS_tests{
     UAS_state state{ 0.0, 0.0, 5.0, 0.0 };
     UAS uas(constraints, state);
     double timestep = 1.0;
-    UAS_command command{ 0.0, 0.0 }; // No acceleration or turn rate
+    UAS_command command{ 5.0, 0.0 };
+    // No acceleration or turn rate
     for (int i = 0; i < 5; ++i) {
       uas.step(timestep, command);
     }
@@ -38,11 +39,11 @@ namespace UAS_tests{
   }
 
   TEST(UASclassTests, AccelerationTest) {
-    UAS_operating_constraints constraints{ 0.0, 10.0, 5.0, 1.0 };
+    UAS_operating_constraints constraints{ 0.0, 10.0, 1.0, 1.0 };
     UAS_state state{ 0.0, 0.0, 5.0, 0.0 };
     UAS uas(constraints, state);
     double timestep = 1.0;
-    UAS_command command{ 1.0, 0.0 }; 
+    UAS_command command{ 10.0, 0.0 }; 
     for (int i = 0; i < 5; ++i) {
       uas.step(timestep, command);
     }
@@ -58,7 +59,8 @@ namespace UAS_tests{
     UAS_state state{ 0.0, 0.0, 5.0, 0.0 };
     UAS uas(constraints, state);
     double timestep = 1.0;
-    UAS_command command{ 10.0, 0.0 };
+
+    UAS_command command{ 100.0, 0.0 };
     for (int i = 0; i < 5; ++i) {
       double old_velocity = uas.getState().v;
       uas.step(timestep, command);
@@ -70,7 +72,7 @@ namespace UAS_tests{
       );
     }
 
-    command.accel = -10;
+    command.velocity = 0;
 
     for (int i = 0; i < 5; ++i) {
       double old_velocity = uas.getState().v;

@@ -27,12 +27,8 @@ void Simulation::run() {
       // Won't always produce a measurement depending on update period
       bool updated = gps_sensor_.update(sim_config_.timestep, uas_.getState());
 
-      if (updated) {
-        gps_measurement_ = gps_sensor_.getMeasurement();
-      }
-
       //Estimate state
-      estimator_.update(gps_measurement_);
+      estimator_.update(gps_measurement_, sim_time_, updated);
 
       sim_time_ += sim_config_.timestep;
     }
