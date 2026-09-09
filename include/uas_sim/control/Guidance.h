@@ -11,11 +11,11 @@
 
 class GuidanceModule {
 public:
-	GuidanceModule(UAS uas);
+	GuidanceModule(UAS_operating_constraints operating_constraints_);
 	                                                                                      
 	UAS_command getCommand(const UAS_state& current_state,
 	const Waypoint& next_waypoint) const;
 private:
 	UAS_command command_;
-	UAS uas_;
+	UAS_operating_constraints operating_constraints_;
 };

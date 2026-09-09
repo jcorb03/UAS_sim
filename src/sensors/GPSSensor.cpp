@@ -16,7 +16,7 @@ GPSSensor::GPSSensor(double noise_stddev, double update_period, double time_til_
   }
 }
 
-void GPSSensor::update(double timestep, const UAS_state& uas_state) 
+bool GPSSensor::update(double timestep, const UAS_state& uas_state) 
 {
   time_since_measurement_ += timestep;
   measurement_age_ += timestep;
@@ -32,11 +32,16 @@ void GPSSensor::update(double timestep, const UAS_state& uas_state)
     time_since_measurement_ -= update_period_;
     measurement_age_ = 0.0;
     measurement_.valid = true;
+    return true;
   }
 
-  
+  return false;
 }
 
 UAS_measurement GPSSensor::getMeasurement() const {
   return measurement_;
+}
+
+double GPSSensor::getNoiseStddev() const {
+  return noise_stddev_;
 }

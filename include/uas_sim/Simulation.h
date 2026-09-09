@@ -6,23 +6,29 @@
 #include "uas_sim/estimation/UASEstimator.h"
 #include <vector>
 
+struct SimConfig {
+  double sim_length;
+  double timestep;
+  double waypoint_tolerance_m;
+};
 
 class Simulation {
   public:
     Simulation(const UAS_operating_constraints& operating_constraints,
       const std::vector<Waypoint>& waypoints,
-      UAS_state initial_state, GPSSensor gps_sensor);
-    void run(double sim_length, double timestep);
+      UAS_state initial_state, GPSSensor gps_sensor, SimConfig sim_config);
+    void run();
     bool getObjective(const UAS_state& state_estimate);
 
 private:
-  // Guidance module Guidance;
-  // Estimation module Estimator;
+  GuidanceModule guidance_;
+  Estimator estimator_;
   UAS uas_;
   UAS_state estimated_state_;
-  UAS_state true_state_;
   GPSSensor gps_sensor_;
+  UAS_measurement gps_measurement_;
   std::vector<Waypoint> waypoints_;
   UAS_operating_constraints operating_constraints_;
   double sim_time_ = 0;
+  SimConfig sim_config_;
 };

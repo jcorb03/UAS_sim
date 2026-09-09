@@ -9,8 +9,9 @@ class GPSSensor
 {
 public:
   GPSSensor(double noise_stddev, double update_period, double time_til_die);
-  void update(double timestep, const UAS_state& uas_state);
+  bool update(double timestep, const UAS_state& uas_state);
   UAS_measurement getMeasurement() const;
+  double getNoiseStddev() const;
 private:
   UAS_measurement measurement_;
   double noise_stddev_;

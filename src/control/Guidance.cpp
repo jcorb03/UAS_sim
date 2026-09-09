@@ -1,6 +1,7 @@
 #include "uas_sim/control/Guidance.h"
 
-GuidanceModule::GuidanceModule(UAS uas): uas_(uas)  {
+GuidanceModule::GuidanceModule(UAS_operating_constraints operating_constraints): 
+  operating_constraints_(operating_constraints)  {
   // Constructor implementation (if needed)
 }
 
@@ -14,7 +15,7 @@ UAS_command GuidanceModule::getCommand(const UAS_state& current_state, const Way
   
   
 
-  double desired_velocity = uas_.getOperatingConstraints().max_speed; // Example constant velocity
+  double desired_velocity = operating_constraints_.max_speed; // Example constant velocity
   
   // Create and return the UAS_command
   UAS_command command;

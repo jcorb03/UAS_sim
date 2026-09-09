@@ -2,28 +2,39 @@
 
 Simulation::Simulation(const UAS_operating_constraints& operating_constraints,
   const std::vector<Waypoint>& waypoints,
-  UAS_state initial_state, GPSSensor gps_sensor) : operating_constraints_(operating_constraints),
-  waypoints_(waypoints), true_state_(initial_state), gps_sensor_(gps_sensor), uas_(operating_constraints, initial_state),
-  estimated_state_(initial_state)
+  UAS_state initial_state, GPSSensor gps_sensor, SimConfig sim_config) : operating_constraints_(operating_constraints),
+  waypoints_(waypoints), gps_sensor_(gps_sensor), uas_(operating_constraints, initial_state),
+  estimated_state_(initial_state), guidance_(operating_constraints_), sim_config_(sim_config)
 {
-  
 }
 
-void Simulation::run(double sim_length, double timestep) {
+void Simulation::run() {
   bool done = false;
-  while (sim_time_ < sim_length && done == false) {
+  while (sim_time_ < sim_config_.sim_length && done == false) {
+    // 
     done = getObjective(estimated_state_);
 
     if (done == false) {
-      // Get Guidance Command - outputs desired state
+      
+      // Get desire velocity and heading
+      UAS_command command = guidance_.getCommand(estimated_state_, waypoints_.front());
 
-      // Dynamics + Control Step - outputs actual state
-      // 
-      // Get sensor measurements - outputs noisy measurements based on actual state
-      // 
-      // Estimate State 
+      // Set demand to within operating constraints and step forward in time
+      // Get true state at next timestep
+      uas_.step(sim_config_.timestep, command);
+ 
+      // Get measurement based off noisy sampling of true_state
+      // Won't always produce a measurement depending on update period
+      bool updated = gps_sensor_.update(sim_config_.timestep, uas_.getState());
 
-      sim_time_ += timestep;
+      if (updated) {
+        gps_measurement_ = gps_sensor_.getMeasurement();
+      }
+
+      //Estimate state
+      estimator_.update(gps_measurement_);
+
+      sim_time_ += sim_config_.timestep;
     }
   }
 }
@@ -39,7 +50,7 @@ bool Simulation::getObjective(const UAS_state& state_estimate) {
 
     double euclid_distance = std::sqrt(dx * dx + dy * dy);
 
-    if (euclid_distance < 1e2) {
+    if (euclid_distance < sim_config_.waypoint_tolerance_m) {
       waypoints_.erase(waypoints_.begin());
     }
     else {
