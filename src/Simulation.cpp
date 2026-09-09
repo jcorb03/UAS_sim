@@ -26,12 +26,32 @@ void Simulation::run() {
       // Get measurement based off noisy sampling of true_state
       // Won't always produce a measurement depending on update period
       bool updated = gps_sensor_.update(sim_config_.timestep, uas_.getState());
-
+      
+      if (updated) {
+        gps_measurement_ = gps_sensor_.getMeasurement();
+      }
       //Estimate state
       estimator_.update(gps_measurement_, sim_time_, updated);
 
+      estimated_state_ = estimator_.get_state_estimate();
+
       sim_time_ += sim_config_.timestep;
+
+      std::cout << "Time: " << sim_time_ << "\n";
+      if (!waypoints_.empty()) {
+        std::cout << "Next waypoint: { "
+          << waypoints_.front().x << " , "
+          << waypoints_.front().y << " }\n";
+      }
+      else {
+        std::cout << "Mission complete\n";
+      }
+      std::cout << "True State: { " << uas_.getState().x <<
+        " , " << uas_.getState().y << " }\n";
+      std::cout << "Estimated State: { " << estimated_state_.x <<
+        " , " << estimated_state_.y << " }\n\n";
     }
+   
   }
 }
 
@@ -55,4 +75,8 @@ bool Simulation::getObjective(const UAS_state& state_estimate) {
   }
 
   return true;
+}
+
+void Simulation::initialiseKalman(KalmanFilterState kalman) {
+  estimator_.initialiseKalmanProperties(kalman);
 }

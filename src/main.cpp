@@ -1,9 +1,69 @@
 #include <iostream>
-#include "uas_sim/dynamics/UAS.h"
-#include "uas_sim/sensors/GPSSensor.h"
+#include "uas_sim/UAS_structs.h"
+#include "uas_sim/Simulation.h"
 
 
 int main() {
-  std::cout << "Hello";
+  
+  UAS_operating_constraints constraints{
+    2.0,    // min_speed [m/s]
+    25.0,   // max_speed [m/s]
+    2.0,    // max_accel [m/s^2]
+    0.5     // max_turn_rate [rad/s]
+  };
+
+  std::vector<Waypoint> waypoints{
+      {100.0, 0.0},
+      {100.0, 100.0},
+      {0.0, 100.0},
+      {0.0, 0.0}
+  };
+
+  UAS_state initial_state{
+      0.0,    // x [m]
+      0.0,    // y [m]
+      10.0,   // velocity [m/s]
+      0.0     // heading [rad]
+  };
+
+  GPSSensor gps_sensor(
+    2.0,    // noise standard deviation [m]
+    1.0,     // update rate [Hz]
+    5.0
+  );
+
+  SimConfig sim_config{
+      0.1,    // timestep [s]
+      60.0,   // simulation length [s]
+      5.0     // waypoint tolerance [m]
+  };
+
+  Simulation simulation(
+    constraints,
+    waypoints,
+    initial_state,
+    gps_sensor,
+    sim_config
+  );
+
+  KalmanFilterState kalman;
+
+  kalman.state_estimate.setZero();
+
+  kalman.P = Eigen::Matrix4d::Identity();
+
+  kalman.A = Eigen::Matrix4d::Identity();
+
+  kalman.Q = Eigen::Matrix4d::Zero();
+
+  kalman.H.setZero();
+
+  kalman.R = Eigen::Matrix2d::Identity() * 4.0;
+
+  kalman.K.setZero();
+
+  simulation.initialiseKalman(kalman);
+  simulation.run();
+
   return 0;
 }

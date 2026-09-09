@@ -114,7 +114,7 @@ namespace UAS_tests {
     EXPECT_NEAR(state.heading, std::numbers::pi / 2.0, 1e-9);
   }
 
-  TEST(EstimatorTest, EKFMeasurementUpdate)
+  TEST(EstimatorTest, SimpleUpdate)
   {
     Estimator estimator;
 

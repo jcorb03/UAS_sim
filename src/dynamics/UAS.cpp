@@ -10,8 +10,8 @@ UAS::UAS(UAS_operating_constraints operating_constraints, UAS_state uas_state)
 
 void UAS::step(double timestep, UAS_command uas_command) {
 
-	state_.x += state_.v * std::cos(state_.heading) * timestep;
-	state_.y += state_.v * std::sin(state_.heading) * timestep;
+	state_.x += state_.v * std::sin(state_.heading) * timestep;
+	state_.y += state_.v * std::cos(state_.heading) * timestep;
 
 	//Change in heading calculation
   double d_heading = uas_command.heading - state_.heading;

@@ -5,6 +5,7 @@
 #include "uas_sim/control/Guidance.h"
 #include "uas_sim/estimation/UASEstimator.h"
 #include <vector>
+#include <iostream>
 
 struct SimConfig {
   double sim_length;
@@ -19,6 +20,7 @@ class Simulation {
       UAS_state initial_state, GPSSensor gps_sensor, SimConfig sim_config);
     void run();
     bool getObjective(const UAS_state& state_estimate);
+    void initialiseKalman(KalmanFilterState kalman);
 
 private:
   GuidanceModule guidance_;
