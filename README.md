@@ -29,4 +29,4 @@ python python/plot_results.py
 
 ## Example Simulation Result
 
-![UAS Trajectory](results/trajectory.png)
+![UAS Trajectory](results/example_trajectory.png)
