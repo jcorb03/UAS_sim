@@ -18,7 +18,7 @@ class Simulation {
     Simulation(const UAS_operating_constraints& operating_constraints,
       const std::vector<Waypoint>& waypoints,
       UAS_state initial_state, GPSSensor gps_sensor, SimConfig sim_config);
-    void run();
+    bool run();
     bool getObjective(const UAS_state& state_estimate);
     void initialiseKalman(KalmanFilterState kalman);
 

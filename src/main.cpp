@@ -66,7 +66,7 @@ int main() {
 
   simulation.initialiseKalman(kalman);
 
-  simulation.run();
+  bool done = simulation.run();
 
   return 0;
 }

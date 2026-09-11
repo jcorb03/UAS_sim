@@ -9,7 +9,7 @@ Simulation::Simulation(const UAS_operating_constraints& operating_constraints,
 
 }
 
-void Simulation::run() {
+bool Simulation::run() {
   bool done = false;
   while (sim_time_ < sim_config_.sim_length && done == false) {
     // 
@@ -57,6 +57,16 @@ void Simulation::run() {
     }
    
   }
+  if (waypoints_.empty()) {
+    std::cout << "Final Waypoint reached \n";
+    std::cout << "Mission Complete \n";
+    return true;
+  }
+  else {
+    std::cout << "Sim length reached without completing mission \n";
+    return false;
+  }
+
 }
 
 bool Simulation::getObjective(const UAS_state& state_estimate) {

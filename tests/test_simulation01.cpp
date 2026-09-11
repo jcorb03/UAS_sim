@@ -29,18 +29,18 @@ namespace UAS_tests {
     };
 
     GPSSensor gps_sensor(
-      0.0,    // noise standard deviation [m]
+      1,    // noise standard deviation [m]
       0.1,     // update rate [Hz]
       5.0
     );
 
     SimConfig sim_config{
-        60.0,    // timestep [s]
-        0.1,   // simulation length [s]
+        120.0,    // sim length [s]
+        0.1,   // timestep[s]
         10.0     // waypoint tolerance [m]
     };
 
-    
+
     Simulation simulation(
       constraints,
       waypoints,
@@ -48,7 +48,7 @@ namespace UAS_tests {
       gps_sensor,
       sim_config
     );
-    
+
     KalmanFilterState kalman;
 
     kalman.state_estimate.setZero();
@@ -57,24 +57,19 @@ namespace UAS_tests {
 
     kalman.A = Eigen::Matrix4d::Identity();
 
-    kalman.Q <<
-      1, 0.0, 0.0, 0.0,
-      0.0, 1, 0.0, 0.0,
-      0.0, 0.0, 1, 0.0,
-      0.0, 0.0, 0.0, 1;
-
+    kalman.Q = Eigen::Matrix4d::Zero();
 
     kalman.H.setZero();
 
     kalman.R = Eigen::Matrix2d::Identity() * 4.0;
 
     kalman.K.setZero();
-    
+
     simulation.initialiseKalman(kalman);
-    
+
     simulation.run();
 
-    EXPECT_EQ(waypoints.size(), 0);
+    EXPECT_EQ(simulation.run(), true);
     
     
   }
