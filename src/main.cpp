@@ -6,11 +6,12 @@
 int main() {
   
   UAS_operating_constraints constraints{
-    2.0,    // min_speed [m/s]
-    25.0,   // max_speed [m/s]
-    2.0,    // max_accel [m/s^2]
-    0.5     // max_turn_rate [rad/s]
+      2.0,    // min_speed [m/s]
+      5.0,   // max_speed [m/s]
+      2.0,    // max_accel [m/s^2]
+      0.5     // max_turn_rate [rad/s]
   };
+
 
   std::vector<Waypoint> waypoints{
       {100.0, 0.0},
@@ -22,21 +23,22 @@ int main() {
   UAS_state initial_state{
       0.0,    // x [m]
       0.0,    // y [m]
-      10.0,   // velocity [m/s]
+      5.0,   // velocity [m/s]
       0.0     // heading [rad]
   };
 
   GPSSensor gps_sensor(
-    2.0,    // noise standard deviation [m]
-    1.0,     // update rate [Hz]
+    1,    // noise standard deviation [m]
+    0.1,     // update rate [Hz]
     5.0
   );
 
   SimConfig sim_config{
-      0.1,    // timestep [s]
-      60.0,   // simulation length [s]
-      5.0     // waypoint tolerance [m]
+      120.0,    // sim length [s]
+      0.1,   // timestep[s]
+      10.0     // waypoint tolerance [m]
   };
+
 
   Simulation simulation(
     constraints,
@@ -63,6 +65,7 @@ int main() {
   kalman.K.setZero();
 
   simulation.initialiseKalman(kalman);
+
   simulation.run();
 
   return 0;

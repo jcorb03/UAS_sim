@@ -45,3 +45,7 @@ UAS_measurement GPSSensor::getMeasurement() const {
 double GPSSensor::getNoiseStddev() const {
   return noise_stddev_;
 }
+
+double GPSSensor::getUpdateInt() const {
+  return update_period_;
+}

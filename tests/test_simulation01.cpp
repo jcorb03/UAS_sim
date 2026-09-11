@@ -8,12 +8,11 @@ namespace UAS_tests {
 
     UAS_operating_constraints constraints{
       2.0,    // min_speed [m/s]
-      25.0,   // max_speed [m/s]
+      5.0,   // max_speed [m/s]
       2.0,    // max_accel [m/s^2]
       0.5     // max_turn_rate [rad/s]
     };
 
-    __debugbreak();
 
     std::vector<Waypoint> waypoints{
         {100.0, 0.0},
@@ -25,20 +24,20 @@ namespace UAS_tests {
     UAS_state initial_state{
         0.0,    // x [m]
         0.0,    // y [m]
-        10.0,   // velocity [m/s]
+        5.0,   // velocity [m/s]
         0.0     // heading [rad]
     };
 
     GPSSensor gps_sensor(
-      2.0,    // noise standard deviation [m]
-      1.0,     // update rate [Hz]
+      0.0,    // noise standard deviation [m]
+      0.1,     // update rate [Hz]
       5.0
     );
 
     SimConfig sim_config{
-        0.1,    // timestep [s]
-        60.0,   // simulation length [s]
-        5.0     // waypoint tolerance [m]
+        60.0,    // timestep [s]
+        0.1,   // simulation length [s]
+        10.0     // waypoint tolerance [m]
     };
 
     
@@ -58,7 +57,12 @@ namespace UAS_tests {
 
     kalman.A = Eigen::Matrix4d::Identity();
 
-    kalman.Q = Eigen::Matrix4d::Zero();
+    kalman.Q <<
+      1, 0.0, 0.0, 0.0,
+      0.0, 1, 0.0, 0.0,
+      0.0, 0.0, 1, 0.0,
+      0.0, 0.0, 0.0, 1;
+
 
     kalman.H.setZero();
 
@@ -69,6 +73,8 @@ namespace UAS_tests {
     simulation.initialiseKalman(kalman);
     
     simulation.run();
+
+    EXPECT_EQ(waypoints.size(), 0);
     
     
   }

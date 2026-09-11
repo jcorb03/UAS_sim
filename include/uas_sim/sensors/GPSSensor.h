@@ -12,6 +12,7 @@ public:
   bool update(double timestep, const UAS_state& uas_state);
   UAS_measurement getMeasurement() const;
   double getNoiseStddev() const;
+  double getUpdateInt() const;
 private:
   UAS_measurement measurement_;
   double noise_stddev_;

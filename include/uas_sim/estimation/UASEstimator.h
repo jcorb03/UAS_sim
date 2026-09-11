@@ -2,6 +2,8 @@
 #include "uas_sim/UAS_structs.h"
 #include <Eigen/Dense>
 #include <cmath>
+#include <numbers>
+#include <iostream>
 
 struct KalmanFilterState {
   // State estimate: [x, y, velocity, heading]
@@ -32,7 +34,9 @@ public:
   Estimator();
 
   void initialiseKalmanProperties(KalmanFilterState kalman);
-  void update(UAS_measurement& measurement, double sim_time, bool gps_update);
+  void update(UAS_measurement& measurement, double sim_time, bool gps_update,
+    double update_period, UAS_operating_constraints operating_constraints_, 
+    UAS_command uas_command);
 
   UAS_state get_state_estimate() const;
 

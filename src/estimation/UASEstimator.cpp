@@ -11,7 +11,10 @@ void Estimator::initialiseKalmanProperties(KalmanFilterState kalman) {
 
 void Estimator::update(UAS_measurement& measurement,
   double sim_time,
-  bool gps_update) {
+  bool gps_update,
+  double update_period,
+  UAS_operating_constraints operating_constraints_,
+  UAS_command uas_command) {
 
   bool new_measurement = false;
 
@@ -32,7 +35,16 @@ void Estimator::update(UAS_measurement& measurement,
     estimated_state_.v = 0.0;
     estimated_state_.heading = 0.0;
 
+    kalman_.state_estimate <<
+      estimated_state_.x,
+      estimated_state_.y,
+      estimated_state_.v,
+      estimated_state_.heading;
+
     time_ = sim_time;
+    while (estimated_state_.heading < 0.0) {
+      estimated_state_.heading += 2 * std::numbers::pi;
+    }
     return;
   }
 
@@ -42,8 +54,11 @@ void Estimator::update(UAS_measurement& measurement,
     double dx = measurement.x.value() - estimated_state_.x;
     double dy = measurement.y.value() - estimated_state_.y;
 
+    time_ = sim_time;
+
+    
     estimated_state_.v =
-      std::sqrt(dx * dx + dy * dy) / elapsed_time;
+      std::sqrt(dx * dx + dy * dy) / (update_period);
 
     estimated_state_.heading =
       std::atan2(dx, dy);
@@ -58,7 +73,10 @@ void Estimator::update(UAS_measurement& measurement,
       estimated_state_.v,
       estimated_state_.heading;
 
-    time_ = sim_time;
+    
+    while (estimated_state_.heading < 0.0) {
+      estimated_state_.heading += 2 * std::numbers::pi;
+    }
     return;
   }
 
@@ -66,33 +84,95 @@ void Estimator::update(UAS_measurement& measurement,
 
     // Prediction Step
 
-    double c = std::cos(estimated_state_.heading);
-    double s = std::sin(estimated_state_.heading);
+    double x = kalman_.state_estimate(0);
+    double y = kalman_.state_estimate(1);
+    double v = kalman_.state_estimate(2);
+    double heading = kalman_.state_estimate(3);
+
+    double c = std::cos(heading);
+    double s = std::sin(heading);
+
+    // -------------------------
+    // Calculate turn rate
+    // -------------------------
+
+    double d_heading = uas_command.heading - heading;
+
+    while (d_heading > std::numbers::pi) {
+      d_heading -= 2 * std::numbers::pi;
+    }
+
+    while (d_heading < -std::numbers::pi) {
+      d_heading += 2 * std::numbers::pi;
+    }
+
+    double unclamped_turn_rate = d_heading;
+
+    double turn_rate = std::clamp(
+      unclamped_turn_rate,
+      -operating_constraints_.max_turn_rate,
+      operating_constraints_.max_turn_rate
+    );
+
+    // -------------------------
+    // Calculate acceleration
+    // -------------------------
+
+    double unclamped_accel = uas_command.velocity - v;
+
+    double accel = std::clamp(
+      unclamped_accel,
+      -operating_constraints_.max_accel,
+      operating_constraints_.max_accel
+    );
+
+    // -------------------------
+    // Predict state
+    // -------------------------
 
     kalman_.state_estimate(0) =
-      estimated_state_.x +
-      estimated_state_.v * s * elapsed_time;
+      x + v * s * elapsed_time;
 
     kalman_.state_estimate(1) =
-      estimated_state_.y +
-      estimated_state_.v * c * elapsed_time;
+      y + v * c * elapsed_time;
 
     kalman_.state_estimate(2) =
-      estimated_state_.v;
+      std::clamp(
+        v + accel * elapsed_time,
+        operating_constraints_.min_speed,
+        operating_constraints_.max_speed
+      );
 
     kalman_.state_estimate(3) =
-      estimated_state_.heading;
+      heading + turn_rate * elapsed_time;
+
+
+    // velocity calc
+    double dv_dv;
+
+    if (std::abs(unclamped_accel) < operating_constraints_.max_accel) {
+      dv_dv = 1.0 - elapsed_time;
+    }
+    else {
+      dv_dv = 1.0;
+    }
+
+    //heading calc
+
+    double dheading_dheading;
+
+    if (std::abs(unclamped_turn_rate) < operating_constraints_.max_turn_rate) {
+      dheading_dheading = 1.0 - elapsed_time;
+    }
+    else {
+      dheading_dheading = 1.0;
+    }
 
     kalman_.A <<
-      1.0, 0.0, s* elapsed_time,
-      estimated_state_.v* c* elapsed_time,
-
-      0.0, 1.0, c* elapsed_time,
-      -estimated_state_.v * s * elapsed_time,
-
-      0.0, 0.0, 1.0, 0.0,
-
-      0.0, 0.0, 0.0, 1.0;
+      1.0, 0.0, s* elapsed_time, v* c* elapsed_time,
+      0.0, 1.0, c* elapsed_time, -v * s * elapsed_time,
+      0.0, 0.0, dv_dv, 0.0,
+      0.0, 0.0, 0.0, dheading_dheading;
 
     kalman_.P =
       kalman_.A * kalman_.P * kalman_.A.transpose()
@@ -128,9 +208,14 @@ void Estimator::update(UAS_measurement& measurement,
     kalman_.K =
       kalman_.P * kalman_.H.transpose() * S.inverse();
 
-    // State update
+    std::cout << "Before update: "
+      << kalman_.state_estimate.transpose() << '\n';
+
     kalman_.state_estimate +=
       kalman_.K * residual;
+
+    std::cout << "After update: "
+      << kalman_.state_estimate.transpose() << '\n';
 
     // Covariance update
     Eigen::Matrix4d I =
@@ -138,6 +223,24 @@ void Estimator::update(UAS_measurement& measurement,
 
     kalman_.P =
       (I - kalman_.K * kalman_.H) * kalman_.P;
+
+    std::cout << "Prediction: "
+      << kalman_.state_estimate.transpose() << '\n';
+
+    std::cout << "GPS: "
+      << z.transpose() << '\n';
+
+    std::cout << "Residual: "
+      << residual.transpose() << '\n';
+
+    std::cout << "P:\n"
+      << kalman_.P << '\n';
+
+    std::cout << "K:\n"
+      << kalman_.K << '\n';
+
+    std::cout << "Updated: "
+      << kalman_.state_estimate.transpose() << "\n\n";
   }
 
   // Convert Kalman state estimate to UAS_state
@@ -146,6 +249,10 @@ void Estimator::update(UAS_measurement& measurement,
   estimated_state_.v = kalman_.state_estimate(2);
   estimated_state_.heading = kalman_.state_estimate(3);
 
+  while (estimated_state_.heading < 0.0) {
+    estimated_state_.heading += 2 * std::numbers::pi;
+  }
+  
   // Update stored time
   time_ = sim_time;
 }

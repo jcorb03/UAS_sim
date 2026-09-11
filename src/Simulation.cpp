@@ -4,8 +4,9 @@ Simulation::Simulation(const UAS_operating_constraints& operating_constraints,
   const std::vector<Waypoint>& waypoints,
   UAS_state initial_state, GPSSensor gps_sensor, SimConfig sim_config) : operating_constraints_(operating_constraints),
   waypoints_(waypoints), gps_sensor_(gps_sensor), uas_(operating_constraints, initial_state),
-  estimated_state_(initial_state), guidance_(operating_constraints_), sim_config_(sim_config)
+  estimated_state_(initial_state), guidance_(operating_constraints), sim_config_(sim_config)
 {
+
 }
 
 void Simulation::run() {
@@ -13,11 +14,12 @@ void Simulation::run() {
   while (sim_time_ < sim_config_.sim_length && done == false) {
     // 
     done = getObjective(estimated_state_);
-
+    double last_gps_time = 0.0;
+    
     if (done == false) {
       
       // Get desire velocity and heading
-      UAS_command command = guidance_.getCommand(estimated_state_, waypoints_.front());
+      UAS_command command = guidance_.getCommand(uas_.getState(), waypoints_.front());
 
       // Set demand to within operating constraints and step forward in time
       // Get true state at next timestep
@@ -29,9 +31,11 @@ void Simulation::run() {
       
       if (updated) {
         gps_measurement_ = gps_sensor_.getMeasurement();
+        last_gps_time = sim_time_;
       }
       //Estimate state
-      estimator_.update(gps_measurement_, sim_time_, updated);
+      estimator_.update(gps_measurement_, sim_time_, updated, gps_sensor_.getUpdateInt(),
+        operating_constraints_,command);
 
       estimated_state_ = estimator_.get_state_estimate();
 

@@ -39,6 +39,12 @@ void UAS::step(double timestep, UAS_command uas_command) {
 		(operating_constraints_.min_speed),
 		operating_constraints_.max_speed);
 
+	state_.heading = std::fmod(state_.heading, 2 * std::numbers::pi);
+
+	if (state_.heading < 0.0) {
+		state_.heading += 2 * std::numbers::pi;
+	}
+
 }
 
 UAS_state UAS::getState() const {
