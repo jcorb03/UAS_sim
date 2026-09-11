@@ -24,7 +24,7 @@ cmake --build out/build/x64-debug --target UAS_Sim
 - Run Executable:
 .\out\build\x64-debug\UAS_Sim.exe
 
-- Visualisations: (in Results folder)
+- Visualisations: 
 python python/plot_results.py
 
 ## Example Simulation Result
