@@ -2,7 +2,7 @@
 
 GuidanceModule::GuidanceModule(UAS_operating_constraints operating_constraints): 
   operating_constraints_(operating_constraints)  {
-  // Constructor implementation (if needed)
+  
 }
 
 UAS_command GuidanceModule::getCommand(const UAS_state& current_state, const Waypoint& next_waypoint) const {
