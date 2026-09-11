@@ -1,7 +1,7 @@
 #include <iostream>
 #include "uas_sim/UAS_structs.h"
 #include "uas_sim/Simulation.h"
-
+#include "uas_sim/data/make_csv.h"
 
 int main() {
   
@@ -67,6 +67,16 @@ int main() {
   simulation.initialiseKalman(kalman);
 
   bool done = simulation.run();
+
+  std::vector<double> time_history = simulation.getTimeHistory();
+
+
+  std::vector<UAS_state> estimation_history = simulation.getStateEstimateHistory();
+
+  
+    bool made = results::makeCsv(time_history, estimation_history);
+    std::cout << "CSV status: " << made;
+  
 
   return 0;
 }

@@ -21,6 +21,8 @@ class Simulation {
     bool run();
     bool getObjective(const UAS_state& state_estimate);
     void initialiseKalman(KalmanFilterState kalman);
+    std::vector<double> getTimeHistory() const;
+    std::vector<UAS_state> getStateEstimateHistory() const;
 
 private:
   GuidanceModule guidance_;
@@ -33,4 +35,6 @@ private:
   UAS_operating_constraints operating_constraints_;
   double sim_time_ = 0;
   SimConfig sim_config_;
+  std::vector<UAS_state> estimation_history_ = {};
+  std::vector<double> time_history_ = {};
 };

@@ -54,6 +54,9 @@ bool Simulation::run() {
         " , " << uas_.getState().y << " }\n";
       std::cout << "Estimated State: { " << estimated_state_.x <<
         " , " << estimated_state_.y << " }\n\n";
+
+      estimation_history_.push_back(estimated_state_);
+      time_history_.push_back(sim_time_);
     }
    
   }
@@ -89,6 +92,14 @@ bool Simulation::getObjective(const UAS_state& state_estimate) {
   }
 
   return true;
+}
+
+std::vector<double> Simulation::getTimeHistory() const {
+  return time_history_;
+}
+
+std::vector<UAS_state> Simulation::getStateEstimateHistory() const {
+  return estimation_history_;
 }
 
 void Simulation::initialiseKalman(KalmanFilterState kalman) {
