@@ -19,7 +19,7 @@ void Simulation::run() {
     if (done == false) {
       
       // Get desire velocity and heading
-      UAS_command command = guidance_.getCommand(uas_.getState(), waypoints_.front());
+      UAS_command command = guidance_.getCommand(estimated_state_, waypoints_.front());
 
       // Set demand to within operating constraints and step forward in time
       // Get true state at next timestep
