@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
-#include "uas_sim/dynamics/UAS.h"
+#include "uas_sim/dynamics/dynamics.h"
 
 namespace UAS_tests{
 
-  TEST(UASclassTests, ConstructorTest) {
+  TEST(DynamicsclassTests, ConstructorTest) {
     UAS_operating_constraints constraints{ 0.0, 10.0, 5.0, 1.0 };
     
     UAS_state state{ 0.0, 0.0, 5.0, 0.0 };
 
-    EXPECT_NO_THROW(UAS uas(constraints, state));
-    UAS uas(constraints, state);
+    EXPECT_NO_THROW(Dynamics uas(constraints, state));
+    Dynamics uas(constraints, state);
     EXPECT_EQ(uas.getState().x, 0.0);
 
     EXPECT_EQ(uas.getState().y, 0.0);
@@ -21,10 +21,10 @@ namespace UAS_tests{
     
   }
 
-  TEST(UASclassTests, StraightLineTest) {
+  TEST(DynamicsclassTests, StraightLineTest) {
     UAS_operating_constraints constraints{ 0.0, 10.0, 5.0, 1.0 };
     UAS_state state{ 0.0, 0.0, 5.0, 0.0 };
-    UAS uas(constraints, state);
+    Dynamics uas(constraints, state);
     double timestep = 1.0;
     UAS_command command{ 5.0, 0.0 };
     // No acceleration or turn rate
@@ -38,10 +38,10 @@ namespace UAS_tests{
     EXPECT_NEAR(final_state.heading, 0.0, 1e-6); // heading should remain approximately 0
   }
 
-  TEST(UASclassTests, AccelerationTest) {
+  TEST(DynamicsclassTests, AccelerationTest) {
     UAS_operating_constraints constraints{ 0.0, 10.0, 1.0, 1.0 };
     UAS_state state{ 0.0, 0.0, 5.0, 0.0 };
-    UAS uas(constraints, state);
+    Dynamics uas(constraints, state);
     double timestep = 1.0;
     UAS_command command{ 10.0, 0.0 }; 
     for (int i = 0; i < 5; ++i) {
@@ -54,10 +54,10 @@ namespace UAS_tests{
     EXPECT_NEAR(final_state.heading, 0.0, 1e-6); // heading should remain approximately 0
   }
 
-  TEST(UASclassTests, MaxAccelerationTest) {
+  TEST(DynamicsclassTests, MaxAccelerationTest) {
     UAS_operating_constraints constraints{ 0.0, 100.0, 5.0, 1.0 };
     UAS_state state{ 0.0, 0.0, 5.0, 0.0 };
-    UAS uas(constraints, state);
+    Dynamics uas(constraints, state);
     double timestep = 1.0;
 
     UAS_command command{ 100.0, 0.0 };

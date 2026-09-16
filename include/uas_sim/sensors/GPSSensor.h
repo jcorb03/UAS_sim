@@ -1,5 +1,5 @@
 #pragma once
-#include "uas_sim/dynamics/UAS.h"
+#include "uas_sim/dynamics/dynamics.h"
 #include "uas_sim/UAS_structs.h"
 #include <random>
 #include <stdexcept>

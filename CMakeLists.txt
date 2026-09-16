@@ -31,12 +31,12 @@ FetchContent_MakeAvailable(googletest Eigen)
 # Main executable
 add_executable(UAS_Sim
     src/main.cpp
-    src/dynamics/UAS.cpp
+    "src/dynamics/dynamics.cpp"
     src/sensors/GPSSensor.cpp
     src/estimation/UASEstimator.cpp
     src/control/Guidance.cpp
     src/Simulation.cpp 
-    src/data/make_csv.cpp)
+    src/data/make_csv.cpp "src/UAS/UAS.cpp")
 
 target_include_directories(UAS_Sim
     PRIVATE
@@ -54,7 +54,7 @@ enable_testing()
 add_executable(UAS_tests
     tests/dynamics/test_UAS.cpp
     tests/sensors/test_GPSSensor.cpp
-    src/dynamics/UAS.cpp
+    "src/dynamics/dynamics.cpp"
     src/sensors/GPSSensor.cpp
     src/estimation/UASEstimator.cpp
     src/control/Guidance.cpp
@@ -62,7 +62,7 @@ add_executable(UAS_tests
     tests/control/test_guidance.cpp 
     tests/estimation/test_GPS_kalman.cpp 
     tests/test_simulation01.cpp 
-    src/data/make_csv.cpp)
+    src/data/make_csv.cpp "src/UAS/UAS.cpp")
 
 target_include_directories(UAS_tests
     PRIVATE

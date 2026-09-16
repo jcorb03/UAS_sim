@@ -1,14 +1,14 @@
-#include "uas_sim/dynamics/UAS.h"
+#include "uas_sim/dynamics/dynamics.h"
 
 
 
-UAS::UAS(UAS_operating_constraints operating_constraints, UAS_state uas_state)
+Dynamics::Dynamics(UAS_operating_constraints operating_constraints, UAS_state uas_state)
 	: operating_constraints_(operating_constraints), state_(uas_state)
 {
 
 }
 
-void UAS::step(double timestep, UAS_command uas_command) {
+void Dynamics::step(double timestep, UAS_command uas_command) {
 
 	state_.x += state_.v * std::sin(state_.heading) * timestep;
 	state_.y += state_.v * std::cos(state_.heading) * timestep;
@@ -47,10 +47,10 @@ void UAS::step(double timestep, UAS_command uas_command) {
 
 }
 
-UAS_state UAS::getState() const {
+UAS_state Dynamics::getState() const {
 	return state_;
 }
 
-UAS_operating_constraints UAS::getOperatingConstraints() const {
+UAS_operating_constraints Dynamics::getOperatingConstraints() const {
 	return operating_constraints_;
 }

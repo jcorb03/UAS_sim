@@ -3,7 +3,7 @@
 Simulation::Simulation(const UAS_operating_constraints& operating_constraints,
   const std::vector<Waypoint>& waypoints,
   UAS_state initial_state, GPSSensor gps_sensor, SimConfig sim_config) : operating_constraints_(operating_constraints),
-  waypoints_(waypoints), gps_sensor_(gps_sensor), uas_(operating_constraints, initial_state),
+  waypoints_(waypoints), gps_sensor_(gps_sensor), dynamics_(operating_constraints, initial_state),
   estimated_state_(initial_state), guidance_(operating_constraints), sim_config_(sim_config)
 {
 
@@ -23,11 +23,11 @@ bool Simulation::run() {
 
       // Set demand to within operating constraints and step forward in time
       // Get true state at next timestep
-      uas_.step(sim_config_.timestep, command);
+      dynamics_.step(sim_config_.timestep, command);
  
       // Get measurement based off noisy sampling of true_state
       // Won't always produce a measurement depending on update period
-      bool updated = gps_sensor_.update(sim_config_.timestep, uas_.getState());
+      bool updated = gps_sensor_.update(sim_config_.timestep, dynamics_.getState());
       
       if (updated) {
         gps_measurement_ = gps_sensor_.getMeasurement();
@@ -50,8 +50,8 @@ bool Simulation::run() {
       else {
         std::cout << "Mission complete\n";
       }
-      std::cout << "True State: { " << uas_.getState().x <<
-        " , " << uas_.getState().y << " }\n";
+      std::cout << "True State: { " << dynamics_.getState().x <<
+        " , " << dynamics_.getState().y << " }\n";
       std::cout << "Estimated State: { " << estimated_state_.x <<
         " , " << estimated_state_.y << " }\n\n";
 
@@ -100,8 +100,4 @@ std::vector<double> Simulation::getTimeHistory() const {
 
 std::vector<UAS_state> Simulation::getStateEstimateHistory() const {
   return estimation_history_;
-}
-
-void Simulation::initialiseKalman(KalmanFilterState kalman) {
-  estimator_.initialiseKalmanProperties(kalman);
 }

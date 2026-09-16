@@ -1,6 +1,6 @@
 #pragma once
 #include "uas_sim/UAS_structs.h"
-#include "uas_sim/dynamics/UAS.h"
+#include "uas_sim/dynamics/dynamics.h"
 #include <stdexcept>
 #include <cmath>
 #include <numbers>

@@ -6,11 +6,11 @@
 #include <cmath>
 #include <numbers>
 
-class UAS
+class Dynamics
 {
 public:
 
-	UAS( UAS_operating_constraints uas_operating_constraints, UAS_state uas_state);
+	Dynamics( UAS_operating_constraints uas_operating_constraints, UAS_state uas_state);
 	void step(double timestep_, UAS_command uas_command);
 
 	UAS_state getState() const;
