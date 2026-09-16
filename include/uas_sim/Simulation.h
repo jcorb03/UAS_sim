@@ -8,11 +8,7 @@
 #include <vector>
 #include <iostream>
 
-struct SimConfig {
-  double sim_length;
-  double timestep;
-  double waypoint_tolerance_m;
-};
+
 
 class Simulation {
   public:
@@ -20,7 +16,7 @@ class Simulation {
     bool run();
     std::vector<double> getTimeHistory() const;
     std::vector<UAS_state> getStateEstimateHistory() const;
-    bool getObjectives(const UAS_state& state_estimate);
+    
 
 private:
   std::vector<UAS> UASs_;
@@ -29,4 +25,5 @@ private:
   std::vector<std::vector<Waypoint>> waypoints_ = {};
   std::vector<UAS_state> estimation_history_ = {};
   std::vector<double> time_history_ = {};
+  std::vector<bool> UAS_statuses = {};
 };

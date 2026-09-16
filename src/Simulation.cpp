@@ -6,95 +6,26 @@ Simulation::Simulation(std::vector<UAS> uas_s , SimConfig sim_config) : UASs_(ua
 }
 
 bool Simulation::run() {
-  bool done = false;
-  while (sim_time_ < sim_config_.sim_length && done == false) {
-    // 
-    done = getObjectives(estimated_state_);
-    double last_gps_time = 0.0;
-    
-    if (done == false) {
-      
-      // Get desire velocity and heading
-      UAS_command command = guidance_.getCommand(estimated_state_, waypoints_.front());
+  bool sim_done = false;
 
-      // Set demand to within operating constraints and step forward in time
-      // Get true state at next timestep
-      dynamics_.step(sim_config_.timestep, command);
- 
-      // Get measurement based off noisy sampling of true_state
-      // Won't always produce a measurement depending on update period
-      bool updated = gps_sensor_.update(sim_config_.timestep, dynamics_.getState());
-      
-      if (updated) {
-        gps_measurement_ = gps_sensor_.getMeasurement();
-        last_gps_time = sim_time_;
-      }
-      //Estimate state
-      estimator_.update(gps_measurement_, sim_time_, updated, gps_sensor_.getUpdateInt(),
-        operating_constraints_,command);
+  while (sim_time_ < sim_config_.sim_length && sim_done == false) {
 
-      estimated_state_ = estimator_.get_state_estimate();
+    UAS_statuses.erase(UAS_statuses.begin(), UAS_statuses.end());
 
-      sim_time_ += sim_config_.timestep;
-
-      std::cout << "Time: " << sim_time_ << "\n";
-      if (!waypoints_.empty()) {
-        std::cout << "Next waypoint: { "
-          << waypoints_.front().x << " , "
-          << waypoints_.front().y << " }\n";
-      }
-      else {
-        std::cout << "Mission complete\n";
-      }
-      std::cout << "True State: { " << dynamics_.getState().x <<
-        " , " << dynamics_.getState().y << " }\n";
-      std::cout << "Estimated State: { " << estimated_state_.x <<
-        " , " << estimated_state_.y << " }\n\n";
-
-      estimation_history_.push_back(estimated_state_);
-      time_history_.push_back(sim_time_);
+    for (UAS uas : UASs_) {
+      bool drone_done = uas.step(sim_config_, sim_time_);
+      UAS_statuses.push_back(drone_done);
     }
-   
-  }
-  if (waypoints_.empty()) {
-    std::cout << "Final Waypoint reached \n";
-    std::cout << "Mission Complete \n";
-    return true;
-  }
-  else {
-    std::cout << "Sim length reached without completing mission \n";
-    return false;
+
+    if (std::find(UAS_statuses.begin(), UAS_statuses.end(), false) == UAS_statuses.end()) {
+      sim_done = true;
+    }
+    sim_time_ += sim_config_.timestep;
   }
 
+  return sim_done;
 }
 
-bool Simulation::getObjectives() {
-
-  waypoints_.erase(waypoints_.begin(), waypoints_.end());
-
-  for (UAS uas : UASs_) {
-    while (!uas.getWaypoints().empty()) {
-
-      Waypoint next_waypoint = uas.getWaypoints().front();
-
-      double dx = uas.state_estimate.x - next_waypoint.x;
-      double dy = uas.state_estimate.y - next_waypoint.y;
-
-      double euclid_distance = std::sqrt(dx * dx + dy * dy);
-
-      if (euclid_distance < sim_config_.waypoint_tolerance_m) {
-        waypoints_.erase(waypoints_.begin());
-      }
-      
-      
-      
-    }
-    waypoints_.
-  }
-
-  
-  return true;
-}
 
 std::vector<double> Simulation::getTimeHistory() const {
   return time_history_;

@@ -47,4 +47,10 @@ struct UAS_measurement {
     bool valid = false;
 };
 
+struct SimConfig {
+  double sim_length;
+  double timestep;
+  double waypoint_tolerance_m;
+};
+
   

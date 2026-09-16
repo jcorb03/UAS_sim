@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "uas_sim/UAS_structs.h"
 #include "uas_sim/dynamics/dynamics.h"
 #include "uas_sim/sensors/GPSSensor.h"
@@ -9,15 +10,14 @@ class UAS {
 public:
   UAS(const UAS_operating_constraints& operating_constraints,
     const std::vector<Waypoint>& waypoints,
-    UAS_state initial_state, GPSSensor gps_sensor, Estimator estimator);
+    UAS_state initial_state, GPSSensor gps_sensor);
 
-  bool getObjective(const UAS_state& state_estimate);
   void initialiseKalman(KalmanFilterState kalman);
-  double getWaypointTolerance();
-  std::vector<Waypoint> getWaypoints();
+  void setWaypointTolerance(SimConfig sim_config);
+  bool getObjective();
+  bool step(SimConfig sim_config, double sim_time);
+  std::vector<Waypoint> getWaypoints() const;
   
-
-
 private:
   GuidanceModule guidance_;
   Estimator estimator_;
@@ -25,8 +25,9 @@ private:
   UAS_state estimated_state_;
   GPSSensor gps_sensor_;
   UAS_measurement gps_measurement_;
-  std::vector<Waypoint> waypoints_;
+  std::vector<Waypoint> waypoints_{};
   UAS_operating_constraints operating_constraints_;
-  double waypoint_tolerance_m = 0;
-
+  std::vector<UAS_state> estimation_history_ = {};
+  std::vector<double> time_history_ = {};
+  double waypoint_tolerance_ = 5.0;
 };

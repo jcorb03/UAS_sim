@@ -39,12 +39,17 @@ int main() {
       10.0     // waypoint tolerance [m]
   };
 
-
-  Simulation simulation(
+  UAS uas(
     constraints,
     waypoints,
     initial_state,
-    gps_sensor,
+    gps_sensor
+  );
+
+  std::vector<UAS> Uas_vec = { uas };
+
+  Simulation simulation(
+    Uas_vec,
     sim_config
   );
 
@@ -64,7 +69,7 @@ int main() {
 
   kalman.K.setZero();
 
-  simulation.initialiseKalman(kalman);
+  uas.initialiseKalman(kalman);
 
   bool done = simulation.run();
 
