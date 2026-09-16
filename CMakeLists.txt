@@ -44,6 +44,11 @@ target_include_directories(UAS_Sim
         ${PROJECT_SOURCE_DIR}/include
 )
 
+target_compile_definitions(UAS_Sim
+    PRIVATE
+        UAS_SIM_PROJECT_DIR="${PROJECT_SOURCE_DIR}"
+)
+
 target_link_libraries(UAS_Sim
     PRIVATE
         Eigen3::Eigen
@@ -68,6 +73,11 @@ add_executable(UAS_tests
 target_include_directories(UAS_tests
     PRIVATE
         ${PROJECT_SOURCE_DIR}/include
+)
+
+target_compile_definitions(UAS_tests
+    PRIVATE
+        UAS_SIM_PROJECT_DIR="${PROJECT_SOURCE_DIR}"
 )
 
 target_link_libraries(UAS_tests

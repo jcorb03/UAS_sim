@@ -18,6 +18,7 @@ fig = plt.figure()
 
 l, = plt.plot([], [], '-k')
 
+
 plt.title("UAS Trajectory")
 plt.xlabel("X Position (m)")
 plt.ylabel("Y Position (m)")

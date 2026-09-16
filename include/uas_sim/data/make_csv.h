@@ -6,6 +6,6 @@
 namespace results {
 
   bool makeCsv(const std::vector<double>& time_history,
-    const std::vector<UAS_state>& estimation_history);
+    const std::vector<std::vector<UAS_state>>& estimation_history);
 
 }

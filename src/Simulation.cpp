@@ -5,6 +5,7 @@ Simulation::Simulation(std::vector<UAS> uas_s , SimConfig sim_config) : UASs_(ua
   for (UAS& uas : UASs_) {
     uas.setWaypointTolerance(sim_config_);
   }
+  estimation_history_.resize(UASs_.size());
 }
 
 bool Simulation::run() {
@@ -20,10 +21,15 @@ bool Simulation::run() {
     }
 
     if (!UASs_.empty()) {
-      estimation_history_.push_back(UASs_.front().getEstimatedState());
+      for (std::size_t uav = 0; uav < UASs_.size(); ++uav) {
+        estimation_history_[uav].push_back(
+          UASs_[uav].getEstimatedState()
+        );
+      }
       time_history_.push_back(sim_time_ + sim_config_.timestep);
     }
-
+    
+   
     if (std::find(UAS_statuses.begin(), UAS_statuses.end(), false) == UAS_statuses.end()) {
       sim_done = true;
     }
@@ -38,6 +44,6 @@ std::vector<double> Simulation::getTimeHistory() const {
   return time_history_;
 }
 
-std::vector<UAS_state> Simulation::getStateEstimateHistory() const {
+std::vector<std::vector<UAS_state>> Simulation::getStateEstimateHistory() const {
   return estimation_history_;
 }

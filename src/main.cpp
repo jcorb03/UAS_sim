@@ -27,6 +27,13 @@ int main() {
       0.0     // heading [rad]
   };
 
+  UAS_state second_initial_state{
+      -20.0,  // x [m]
+      0.0,    // y [m]
+      5.0,    // velocity [m/s]
+      0.0     // heading [rad]
+  };
+
   GPSSensor gps_sensor(
     1,    // noise standard deviation [m]
     0.1,     // update rate [Hz]
@@ -34,7 +41,7 @@ int main() {
   );
 
   SimConfig sim_config{
-      190.0,    // sim length [s]
+      210.0,    // sim length [s]
       0.1,   // timestep[s]
       10.0     // waypoint tolerance [m]
   };
@@ -43,6 +50,13 @@ int main() {
     constraints,
     waypoints,
     initial_state,
+    gps_sensor
+  );
+
+  UAS second_uas(
+    constraints,
+    waypoints,
+    second_initial_state,
     gps_sensor
   );
 
@@ -63,8 +77,9 @@ int main() {
   kalman.K.setZero();
 
   uas.initialiseKalman(kalman);
+  second_uas.initialiseKalman(kalman);
 
-  std::vector<UAS> Uas_vec = { uas };
+  std::vector<UAS> Uas_vec = { uas, second_uas };
 
   Simulation simulation(
     Uas_vec,
@@ -76,11 +91,12 @@ int main() {
   std::vector<double> time_history = simulation.getTimeHistory();
 
 
-  std::vector<UAS_state> estimation_history = simulation.getStateEstimateHistory();
+  std::vector<std::vector<UAS_state>> estimation_history = simulation.getStateEstimateHistory();
 
   
     bool made = results::makeCsv(time_history, estimation_history);
-    std::cout << "CSV status: " << made;
+    std::cout << "Simulation complete: " << done << "\n"
+              << "CSV status: " << made << '\n';
   
 
   return 0;

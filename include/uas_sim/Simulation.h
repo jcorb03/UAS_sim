@@ -15,7 +15,7 @@ class Simulation {
     Simulation(std::vector<UAS> uas_s , SimConfig sim_config);
     bool run();
     std::vector<double> getTimeHistory() const;
-    std::vector<UAS_state> getStateEstimateHistory() const;
+    std::vector<std::vector<UAS_state>> getStateEstimateHistory() const;
     
 
 private:
@@ -23,7 +23,7 @@ private:
   double sim_time_ = 0;
   SimConfig sim_config_;
   std::vector<std::vector<Waypoint>> waypoints_ = {};
-  std::vector<UAS_state> estimation_history_ = {};
+  std::vector<std::vector<UAS_state>> estimation_history_ = {};
   std::vector<double> time_history_ = {};
   std::vector<bool> UAS_statuses = {};
 };
