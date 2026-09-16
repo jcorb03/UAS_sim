@@ -35,7 +35,7 @@ namespace UAS_tests {
     );
 
     SimConfig sim_config{
-        120.0,    // sim length [s]
+        190.0,    // sim length [s]
         0.1,   // timestep[s]
         10.0     // waypoint tolerance [m]
     };
@@ -46,13 +46,6 @@ namespace UAS_tests {
       waypoints,
       initial_state,
       gps_sensor
-    );
-
-    std::vector<UAS> Uas_vec = { uas };
-
-    Simulation simulation(
-      Uas_vec,
-      sim_config
     );
 
     KalmanFilterState kalman;
@@ -73,9 +66,14 @@ namespace UAS_tests {
 
     uas.initialiseKalman(kalman);
 
-    simulation.run();
+    std::vector<UAS> Uas_vec = { uas };
 
-    EXPECT_EQ(simulation.run(), true);
+    Simulation simulation(
+      Uas_vec,
+      sim_config
+    );
+
+    EXPECT_TRUE(simulation.run());
     
     
   }

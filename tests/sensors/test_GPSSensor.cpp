@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include "uas_sim/sensors/GPSSensor.h"
-/**
+
 namespace UAS_tests {
   TEST(GPSSensorTests, ConstructorTest) {
 
@@ -77,4 +77,4 @@ namespace UAS_tests {
     gps_sensor.update(0.6, state);
     EXPECT_FALSE(gps_sensor.getMeasurement().valid);
   }
-}*/
+}

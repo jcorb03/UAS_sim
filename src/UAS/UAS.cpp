@@ -11,7 +11,7 @@ UAS::UAS(const UAS_operating_constraints& operating_constraints,
   
 }
 
-void UAS::initialiseKalman(KalmanFilterState kalman) {
+void UAS::initialiseKalman(const KalmanFilterState& kalman) {
   estimator_.initialiseKalmanProperties(kalman);
 }
 
@@ -38,13 +38,15 @@ std::vector<Waypoint> UAS::getWaypoints() const {
   return waypoints_;
 }
 
+UAS_state UAS::getEstimatedState() const {
+  return estimated_state_;
+}
+
 bool UAS::step(SimConfig sim_config, double sim_time) {
   bool done = false;
   
     // 
     done = getObjective();
-    double last_gps_time = 0.0;
-
     if (done == false) {
 
       // Get desire velocity and heading
@@ -60,7 +62,6 @@ bool UAS::step(SimConfig sim_config, double sim_time) {
 
       if (updated) {
         gps_measurement_ = gps_sensor_.getMeasurement();
-        last_gps_time = sim_time;
       }
       //Estimate state
       estimator_.update(gps_measurement_, sim_time, updated, gps_sensor_.getUpdateInt(),
@@ -68,24 +69,8 @@ bool UAS::step(SimConfig sim_config, double sim_time) {
 
       estimated_state_ = estimator_.get_state_estimate();
 
-      sim_time += sim_config.timestep;
-
-      std::cout << "Time: " << sim_time << "\n";
-      if (!waypoints_.empty()) {
-        std::cout << "Next waypoint: { "
-          << waypoints_.front().x << " , "
-          << waypoints_.front().y << " }\n";
-      }
-      else {
-        std::cout << "Mission complete\n";
-      }
-      std::cout << "True State: { " << dynamics_.getState().x <<
-        " , " << dynamics_.getState().y << " }\n";
-      std::cout << "Estimated State: { " << estimated_state_.x <<
-        " , " << estimated_state_.y << " }\n\n";
-
       estimation_history_.push_back(estimated_state_);
-      time_history_.push_back(sim_time);
+      time_history_.push_back(sim_time + sim_config.timestep);
 
       if (waypoints_.empty()) {
         std::cout << "Final Waypoint reached \n";
@@ -93,4 +78,6 @@ bool UAS::step(SimConfig sim_config, double sim_time) {
         return true;
       }
     }
+
+    return getObjective();
 }

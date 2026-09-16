@@ -34,7 +34,7 @@ int main() {
   );
 
   SimConfig sim_config{
-      120.0,    // sim length [s]
+      190.0,    // sim length [s]
       0.1,   // timestep[s]
       10.0     // waypoint tolerance [m]
   };
@@ -44,13 +44,6 @@ int main() {
     waypoints,
     initial_state,
     gps_sensor
-  );
-
-  std::vector<UAS> Uas_vec = { uas };
-
-  Simulation simulation(
-    Uas_vec,
-    sim_config
   );
 
   KalmanFilterState kalman;
@@ -70,6 +63,13 @@ int main() {
   kalman.K.setZero();
 
   uas.initialiseKalman(kalman);
+
+  std::vector<UAS> Uas_vec = { uas };
+
+  Simulation simulation(
+    Uas_vec,
+    sim_config
+  );
 
   bool done = simulation.run();
 

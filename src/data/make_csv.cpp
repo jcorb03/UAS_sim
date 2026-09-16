@@ -10,9 +10,7 @@ namespace results {
     const std::vector<UAS_state>& estimation_history)
   {
     const std::filesystem::path output_path =
-      std::filesystem::absolute("../../../results/results.csv");
-
-    std::cout << "CSV output: " << output_path << '\n';
+      std::filesystem::current_path() / "results" / "results.csv";
 
     std::ofstream myfile(output_path);
 

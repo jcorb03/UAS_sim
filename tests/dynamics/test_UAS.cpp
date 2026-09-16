@@ -32,8 +32,8 @@ namespace UAS_tests{
       uas.step(timestep, command);
     }
     UAS_state final_state = uas.getState();
-    EXPECT_NEAR(final_state.x, 25.0, 1e-6); // x should be approximately 25
-    EXPECT_NEAR(final_state.y, 0.0, 1e-6);   // y should remain approximately 0
+    EXPECT_NEAR(final_state.x, 0.0, 1e-6);   // heading 0 is north (+y)
+    EXPECT_NEAR(final_state.y, 25.0, 1e-6);  // y should be approximately 25
     EXPECT_NEAR(final_state.v, 5.0, 1e-6);   // speed should remain approximately 5
     EXPECT_NEAR(final_state.heading, 0.0, 1e-6); // heading should remain approximately 0
   }
@@ -48,8 +48,8 @@ namespace UAS_tests{
       uas.step(timestep, command);
     }
     UAS_state final_state = uas.getState();
-    EXPECT_NEAR(final_state.x, 35.0, 1e-6); // x should be 35
-    EXPECT_NEAR(final_state.y, 0.0, 1e-6);   // y should remain approximately 0
+    EXPECT_NEAR(final_state.x, 0.0, 1e-6);   // heading 0 is north (+y)
+    EXPECT_NEAR(final_state.y, 35.0, 1e-6);  // y should be 35
     EXPECT_NEAR(final_state.v, 10.0, 1e-6);   // speed accelerate to 10
     EXPECT_NEAR(final_state.heading, 0.0, 1e-6); // heading should remain approximately 0
   }

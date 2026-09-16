@@ -208,14 +208,8 @@ void Estimator::update(UAS_measurement& measurement,
     kalman_.K =
       kalman_.P * kalman_.H.transpose() * S.inverse();
 
-    std::cout << "Before update: "
-      << kalman_.state_estimate.transpose() << '\n';
-
     kalman_.state_estimate +=
       kalman_.K * residual;
-
-    std::cout << "After update: "
-      << kalman_.state_estimate.transpose() << '\n';
 
     // Covariance update
     Eigen::Matrix4d I =
@@ -224,23 +218,6 @@ void Estimator::update(UAS_measurement& measurement,
     kalman_.P =
       (I - kalman_.K * kalman_.H) * kalman_.P;
 
-    std::cout << "Prediction: "
-      << kalman_.state_estimate.transpose() << '\n';
-
-    std::cout << "GPS: "
-      << z.transpose() << '\n';
-
-    std::cout << "Residual: "
-      << residual.transpose() << '\n';
-
-    std::cout << "P:\n"
-      << kalman_.P << '\n';
-
-    std::cout << "K:\n"
-      << kalman_.K << '\n';
-
-    std::cout << "Updated: "
-      << kalman_.state_estimate.transpose() << "\n\n";
   }
 
   // Convert Kalman state estimate to UAS_state

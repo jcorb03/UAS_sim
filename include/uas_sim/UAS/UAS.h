@@ -12,11 +12,12 @@ public:
     const std::vector<Waypoint>& waypoints,
     UAS_state initial_state, GPSSensor gps_sensor);
 
-  void initialiseKalman(KalmanFilterState kalman);
+  void initialiseKalman(const KalmanFilterState& kalman);
   void setWaypointTolerance(SimConfig sim_config);
   bool getObjective();
   bool step(SimConfig sim_config, double sim_time);
   std::vector<Waypoint> getWaypoints() const;
+  UAS_state getEstimatedState() const;
   
 private:
   GuidanceModule guidance_;
