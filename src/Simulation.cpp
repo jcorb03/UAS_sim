@@ -1,10 +1,6 @@
 #include "uas_sim/Simulation.h"
 
-Simulation::Simulation(const UAS_operating_constraints& operating_constraints,
-  const std::vector<Waypoint>& waypoints,
-  UAS_state initial_state, GPSSensor gps_sensor, SimConfig sim_config) : operating_constraints_(operating_constraints),
-  waypoints_(waypoints), gps_sensor_(gps_sensor), dynamics_(operating_constraints, initial_state),
-  estimated_state_(initial_state), guidance_(operating_constraints), sim_config_(sim_config)
+Simulation::Simulation(std::vector<UAS> uas_s , SimConfig sim_config) : UASs_(uas_s), sim_config_(sim_config)
 {
 
 }
@@ -13,7 +9,7 @@ bool Simulation::run() {
   bool done = false;
   while (sim_time_ < sim_config_.sim_length && done == false) {
     // 
-    done = getObjective(estimated_state_);
+    done = getObjectives(estimated_state_);
     double last_gps_time = 0.0;
     
     if (done == false) {
@@ -72,25 +68,31 @@ bool Simulation::run() {
 
 }
 
-bool Simulation::getObjective(const UAS_state& state_estimate) {
+bool Simulation::getObjectives() {
 
-  while (!waypoints_.empty()) {
+  waypoints_.erase(waypoints_.begin(), waypoints_.end());
 
-    Waypoint next_waypoint = waypoints_.front();
+  for (UAS uas : UASs_) {
+    while (!uas.getWaypoints().empty()) {
 
-    double dx = state_estimate.x - next_waypoint.x;
-    double dy = state_estimate.y - next_waypoint.y;
+      Waypoint next_waypoint = uas.getWaypoints().front();
 
-    double euclid_distance = std::sqrt(dx * dx + dy * dy);
+      double dx = uas.state_estimate.x - next_waypoint.x;
+      double dy = uas.state_estimate.y - next_waypoint.y;
 
-    if (euclid_distance < sim_config_.waypoint_tolerance_m) {
-      waypoints_.erase(waypoints_.begin());
+      double euclid_distance = std::sqrt(dx * dx + dy * dy);
+
+      if (euclid_distance < sim_config_.waypoint_tolerance_m) {
+        waypoints_.erase(waypoints_.begin());
+      }
+      
+      
+      
     }
-    else {
-      return false;
-    }
+    waypoints_.
   }
 
+  
   return true;
 }
 

@@ -16,13 +16,14 @@ struct SimConfig {
 
 class Simulation {
   public:
-    Simulation( SimConfig sim_config);
+    Simulation(std::vector<UAS> uas_s , SimConfig sim_config);
     bool run();
     std::vector<double> getTimeHistory() const;
     std::vector<UAS_state> getStateEstimateHistory() const;
-    bool getObjective(const UAS_state& state_estimate);
+    bool getObjectives(const UAS_state& state_estimate);
 
 private:
+  std::vector<UAS> UASs_;
   double sim_time_ = 0;
   SimConfig sim_config_;
   std::vector<std::vector<Waypoint>> waypoints_ = {};

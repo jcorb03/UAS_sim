@@ -14,6 +14,9 @@ public:
   bool getObjective(const UAS_state& state_estimate);
   void initialiseKalman(KalmanFilterState kalman);
   double getWaypointTolerance();
+  std::vector<Waypoint> getWaypoints();
+  
+
 
 private:
   GuidanceModule guidance_;
