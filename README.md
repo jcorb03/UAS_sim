@@ -2,6 +2,8 @@
 
 Basic UAS/Drone 2D C++ simulation platform
 
+Latest Update v0.2: Multiple drone simulation
+
 ## Current Capabilities
 
 - Waypoint Navigation 
