@@ -27,25 +27,13 @@ bool ObstacleMap::isSegmentFree(const Waypoint& from, const Waypoint& to) const 
   double dx = (to.x - from.x);
   double dy = (to.y - from.y);
 
-  for (int i = 0; i < N; ++i) {
+  for (int i = 1; i < N; ++i) {
 
     point.x = from.x + (i / N) * dx;
     point.y = from.y + (i / N) * dy;
 
-    for (const CircleObstacle& circle : circles) {
-      bool hit_circle = std::sqrt((point.x - circle.x) * (point.x - circle.x)
-        + (point.y - circle.y) * (point.y - circle.y)) < circle.radius;
-      if (hit_circle) {
-        return false;
-      }
-    }
-
-    for (const RectangleObstacle& obstacle : rectangles) {
-      bool hit_rec = (point.x > obstacle.min_x && point.y > obstacle.min_y &&
-        point.x < obstacle.max_x && point.y < obstacle.max_y);
-      if (hit_rec) {
-        return false;
-      }
+    if (!isPointFree(point)) {
+      return false;
     }
   }
   return true;
