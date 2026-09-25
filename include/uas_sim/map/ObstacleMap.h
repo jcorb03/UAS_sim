@@ -2,6 +2,7 @@
 
 #include "uas_sim/UAS_structs.h"
 #include <vector>
+#include <cmath>
 
 struct CircleObstacle {
     double x;

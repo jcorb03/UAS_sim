@@ -1,8 +1,9 @@
 #pragma once
 #include <vector>
 #include "uas_sim/UAS_structs.h"
-#include "uas_sim/ObstacleMap.h"
+#include "uas_sim/map/ObstacleMap.h"
 #include <random>
+
 enum class RoutePlanningAlgos {
   SIMPLE,
   RRT_STAR
