@@ -30,7 +30,7 @@ struct ObstacleMap {
 
     double safety_margin = 5.0;
 
-    bool isPointFree(double x, double y) const;
+    bool isPointFree(const Waypoint& to) const;
 
     bool isSegmentFree(
         const Waypoint& from,
