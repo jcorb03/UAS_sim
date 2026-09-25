@@ -1,10 +1,6 @@
 #pragma once
 #include <optional>
 
-enum class ControlAlgorithm {
-  SIMPLE
-};
-
 enum class EstimationAlgorithm {
   KALMAN
 };
