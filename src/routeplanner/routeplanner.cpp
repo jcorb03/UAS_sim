@@ -1,4 +1,7 @@
 #include "uas_sim\routeplanner\routeplanner.h"
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 
 RoutePlanner::RoutePlanner(std::vector<Waypoint> checkpoints, ObstacleMap obstacle_map): checkpoints_(checkpoints),
 obstacle_map_(obstacle_map){
@@ -26,9 +29,9 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
   const double dx = bounds.max_x - bounds.min_x;
   const double dy = bounds.max_y - bounds.min_y;
 
-  constexpr int N = 200;
-  const double max_extension = dx / 10.0;
-  const double neighbour_radius = dx / 100.0;
+  constexpr int N = 20000;
+  const double max_extension = dx / 3.0;
+  const double neighbour_radius = dx / 10.0;
   constexpr double goal_tolerance = 5.0;
 
   std::random_device rd;
@@ -59,7 +62,8 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
       });
 
     int best_goal_node = -1;
-    double best_goal_cost = dx *dy;
+    double best_goal_cost =
+      std::numeric_limits<double>::infinity();
 
     for (int i = 0; i < N; ++i)
     {
@@ -76,7 +80,7 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
       // Find nearest node
       int nearest_index = 0;
       double nearest_dist_sq =
-        dx*dy;
+        std::numeric_limits<double>::infinity();
 
       for (std::size_t j = 0; j < nodes.size(); ++j)
       {
@@ -275,5 +279,31 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
       path.end());
   }
 
+  writePathCSV(overall_path);
   return overall_path;
+}
+
+void RoutePlanner::writePathCSV(const std::vector<Waypoint>& overall_path) const {
+  const std::filesystem::path path_filepath =
+    std::filesystem::path{ UAS_SIM_PROJECT_DIR } / "results" "/path.csv";
+  std::ofstream path_file(path_filepath);
+  path_file << "X,Y\n";
+
+  for (const Waypoint& waypoint : overall_path)
+  {
+    path_file << waypoint.x << ","
+      << waypoint.y <<  "\n";
+  
+    const std::filesystem::path checkpoints_path =
+      std::filesystem::path{ UAS_SIM_PROJECT_DIR } / "results" "/checkpoints.csv";
+    std::ofstream path_file(checkpoints_path);
+    path_file << "X,Y\n";
+
+    for (const Waypoint& waypoint : checkpoints_)
+    {
+      path_file << waypoint.x << ","
+        << waypoint.y << "\n";
+    }
+  }
+
 }

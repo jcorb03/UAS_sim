@@ -3,6 +3,8 @@
 #include "uas_sim/UAS_structs.h"
 #include <vector>
 #include <cmath>
+#include <string>
+
 
 struct CircleObstacle {
     double x;
@@ -36,4 +38,9 @@ struct ObstacleMap {
     bool isSegmentFree(
         const Waypoint& from,
         const Waypoint& to) const;
+
+    void writeToCSV() const;
+
+    double distance(const Waypoint& to, const RectangleObstacle& obstacle) const;
+      
 };

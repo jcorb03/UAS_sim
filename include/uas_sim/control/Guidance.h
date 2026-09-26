@@ -40,5 +40,5 @@ private:
 	FollowerMethod method_ = FollowerMethod::DIRECT;
 	UAS_operating_constraints operating_constraints_;
 	std::vector<Waypoint> waypoints_;
-	double lookahead_time_ =2.0;
+	double lookahead_time_ = 2.0;
 };

@@ -24,8 +24,9 @@ public:
 
   std::vector<Waypoint> Plan(const Waypoint& start);
 
+  void writePathCSV(const std::vector<Waypoint>& overall_path) const;
 private:
-
+  
   std::vector<Waypoint> plan_RRT_route(Waypoint start);
 
   RoutePlanningAlgos algorithm_ = RoutePlanningAlgos::SIMPLE;
