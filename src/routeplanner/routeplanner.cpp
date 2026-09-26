@@ -21,15 +21,17 @@ std::vector<Waypoint> RoutePlanner::Plan(const Waypoint& start) {
     return plan_RRT_route(start);
   }
 }
+ 
 
-std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
+
+std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start) 
 {
   const WorldBounds& bounds = obstacle_map_.bounds;
 
   const double dx = bounds.max_x - bounds.min_x;
   const double dy = bounds.max_y - bounds.min_y;
 
-  constexpr int N = 20000;
+  constexpr int N = 10000;
   const double max_extension = dx / 3.0;
   const double neighbour_radius = dx / 10.0;
   constexpr double goal_tolerance = 5.0;

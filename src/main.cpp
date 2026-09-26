@@ -4,6 +4,7 @@
 #include "uas_sim/data/make_csv.h"
 #include "uas_sim/map/ObstacleMap.h"
 #include "uas_sim/routeplanner/routeplanner.h"
+#include "uas_sim/courses/course1.h"
 
 void SimulationTestRun() {
 
@@ -104,35 +105,63 @@ void SimulationTestRun() {
 
 int main() {
   
-  WorldBounds bounds{ 0.0,0.0,100.0,100.0 };
-
-  CircleObstacle circle1{ 10.0, 15.0, 3.0 };
-  CircleObstacle circle2{ 20.0, 75.0, 4.0 };
-  CircleObstacle circle3{ 50.0, 50.0, 5.0 };
-  std::vector<CircleObstacle> circles = { circle1, circle2, circle3 };
-
-
-  RectangleObstacle rectangle1{ 20.0, 20.0, 22.0, 23.0 };
-  RectangleObstacle rectangle2{ 65.0, 40.0, 80.0, 48.0 };
-  std::vector<RectangleObstacle> rectangles = { rectangle1, rectangle2};
-
-  ObstacleMap map;
-  map.bounds = bounds;
-  map.circles = circles;
-  map.rectangles = rectangles;
-
-  map.writeToCSV();
-
-  std::vector<Waypoint> checkpoints{
-    Waypoint(10.0, 10.0),
-    Waypoint(60.0, 35.0),
-    Waypoint(80.0, 65.0),
-    Waypoint(20.0, 90.0),
+  UAS_operating_constraints constraints{
+     2.0,    // min_speed [m/s]
+     5.0,   // max_speed [m/s]
+     2.0,    // max_accel [m/s^2]
+     0.5     // max_turn_rate [rad/s]
   };
 
-  RoutePlanner planner(checkpoints, map);
-  planner.SetPlanningAlgorithm(RoutePlanningAlgos::RRT_STAR);
-  planner.Plan(Waypoint(10.0, 90.0));
+  RoutePlanner planner = Courses::Course1();
+  std::vector<Waypoint> path = planner.Plan(Waypoint(10.0, 90.0));
+
+  PathFollower guidance(constraints,
+    path);
+
+  UAS_state state(10.0, 90.0, 5.0, 3.14);
+
+  guidance.SetMethod(FollowerMethod::PURE_PURSUIT);
+
+  //Simple loop
+  double time = 0.0;
+  double timestep = 0.1;
+  std::vector<std::vector<UAS_state>> state_history = {};
+  state_history.resize(1);
+  state_history.front().push_back(state);
+  std::vector<double> time_history = {time};
+
+  double dist = std::numeric_limits<double>::infinity();
+  Waypoint state_coords = { state.x, state.y };
+
+  while (time < 90.0) {
+    UAS_command command = guidance.GetCommand(state, path);
+
+    // Step forward
+    state.x += state.v * std::sin(state.heading) * timestep;
+    state.y += state.v * std::cos(state.heading) * timestep;
+
+    double heading_error =
+      command.heading - state.heading;
+
+    heading_error =
+      std::atan2(
+        std::sin(heading_error),
+        std::cos(heading_error));
+
+    double turn_rate = std::clamp((heading_error) / timestep,
+      -constraints.max_turn_rate, (constraints.max_turn_rate));
+
+    state.heading += turn_rate * timestep;
+
+    time += timestep;
+    state_history.front().push_back(state);
+    time_history.push_back(time);
+
+    state_coords = { state.x, state.y };
+  }
   
+  bool made = results::makeCsv(time_history, state_history);
+
+
   return 0;
 }

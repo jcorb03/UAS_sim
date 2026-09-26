@@ -10,12 +10,14 @@ rectangles_path = project_dir / "results" / "rectangles.csv"
 bounds_path = project_dir / "results" / "bounds.csv"
 path_filepath = project_dir / "results" / "path.csv"
 checkpoints_path = project_dir / "results" / "checkpoints.csv"
+trajectory_path = project_dir / "results" / "results.csv"
 
 circles_df = pd.read_csv(circles_path)
 rectangles_df = pd.read_csv(rectangles_path)
 bounds_df = pd.read_csv(bounds_path)
 path_df = pd.read_csv(path_filepath)
 checkpoints_df = pd.read_csv(checkpoints_path)
+trajectory_df = pd.read_csv(trajectory_path)
 
 from matplotlib.patches import Rectangle, Circle
 
@@ -78,7 +80,8 @@ for _,row in checkpoints_df.iterrows():
 
 #add planned path to plot
 ax.plot(path_df["X"],path_df["Y"], color = "green")
-
+ax.plot(trajectory_df["UAV0_X"],trajectory_df["UAV0_Y"], color = "orange")
+ax.legend(['path', 'trajectory'])
 # Keep x and y scales equal
 ax.set_aspect("equal")
 
