@@ -2,11 +2,11 @@
 
 Basic UAS/Drone 2D C++ simulation platform
 
-Latest Update v0.2: Multiple drone simulation
+Latest Update v1.3 Object Avoidance
 
 ## Current Capabilities
 
-- Waypoint Navigation 
+- Waypoint Navigation using RRT path planning and Pure Pursuit Path following
 - Configurable GPS sensor (Noise, Update Frequency)
 - Extended Kalman Filter state estimation
 - Basic UAS capability configuration (speed range and acceleration capability)
@@ -31,4 +31,4 @@ python python/plot_results.py
 
 ## Example Simulation Result
 
-![UAS Trajectory](results/example_trajectory.png)
+![UAS Trajectory](results/example_map.png)

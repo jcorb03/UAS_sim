@@ -133,7 +133,7 @@ int main() {
   double dist = std::numeric_limits<double>::infinity();
   Waypoint state_coords = { state.x, state.y };
 
-  while (time < 90.0) {
+  while (dist > 1.0) {
     UAS_command command = guidance.GetCommand(state, path);
 
     // Step forward
@@ -157,8 +157,12 @@ int main() {
     state_history.front().push_back(state);
     time_history.push_back(time);
 
-    state_coords = { state.x, state.y };
-  }
+    state_coords.x = state.x; 
+    state_coords.y = state.y;
+    dist = helpers::distance(state_coords, path.back());
+  };
+    
+  
   
   bool made = results::makeCsv(time_history, state_history);
 

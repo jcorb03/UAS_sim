@@ -28,7 +28,7 @@ namespace Courses {
       Waypoint(5.0, 5.0),
       Waypoint(60.0, 35.0),
       Waypoint(80.0, 65.0),
-      Waypoint(20.0, 90.0),
+      Waypoint(40.0, 90.0),
     };
 
     RoutePlanner planner(checkpoints, map);
