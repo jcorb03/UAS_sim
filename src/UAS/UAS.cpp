@@ -6,7 +6,7 @@ UAS::UAS(const UAS_operating_constraints& operating_constraints,
   operating_constraints_(operating_constraints), waypoints_(waypoints),
   estimated_state_(initial_state), gps_sensor_(gps_sensor),
   dynamics_(operating_constraints, initial_state),
-  guidance_(operating_constraints_)
+  guidance_(operating_constraints_, waypoints)
 {
   
 }
@@ -50,7 +50,7 @@ bool UAS::step(SimConfig sim_config, double sim_time) {
     if (done == false) {
 
       // Get desire velocity and heading
-      UAS_command command = guidance_.getCommand(estimated_state_, waypoints_.front());
+      UAS_command command = guidance_.GetCommand(estimated_state_, waypoints_);
 
       // Set demand to within operating constraints and step forward in time
       // Get true state at next timestep

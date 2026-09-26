@@ -37,7 +37,7 @@ add_executable(UAS_Sim
     src/estimation/UASEstimator.cpp
     src/control/Guidance.cpp
     src/Simulation.cpp 
-    src/data/make_csv.cpp "src/UAS/UAS.cpp" "src/routeplanner/routeplanner.cpp" "src/map/ObstacleMap.cpp")
+    src/data/make_csv.cpp "src/UAS/UAS.cpp" "src/routeplanner/routeplanner.cpp" "src/map/ObstacleMap.cpp" "include/uas_sim/helperfunctions.h")
 
 target_include_directories(UAS_Sim
     PRIVATE
@@ -68,7 +68,7 @@ add_executable(UAS_tests
     tests/control/test_guidance.cpp 
     tests/estimation/test_GPS_kalman.cpp 
     tests/test_simulation01.cpp 
-    src/data/make_csv.cpp "src/UAS/UAS.cpp" "src/routeplanner/routeplanner.cpp" "src/map/ObstacleMap.cpp")
+    src/data/make_csv.cpp "src/UAS/UAS.cpp" "src/routeplanner/routeplanner.cpp" "src/map/ObstacleMap.cpp" "include/uas_sim/helperfunctions.h")
 
 target_include_directories(UAS_tests
     PRIVATE

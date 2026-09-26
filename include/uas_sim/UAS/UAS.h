@@ -20,7 +20,7 @@ public:
   UAS_state getEstimatedState() const;
   
 private:
-  GuidanceModule guidance_;
+  PathFollower guidance_;
   Estimator estimator_;
   Dynamics dynamics_;
   UAS_state estimated_state_;
