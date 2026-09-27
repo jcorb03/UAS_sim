@@ -4,11 +4,31 @@
 #include "uas_sim/sensors/GPSSensor.h"
 #include "uas_sim/control/Guidance.h"
 #include "uas_sim/estimation/UASEstimator.h"
+#include "uas_sim/routeplanner/routeplanner.h"
 #include "uas_sim/UAS/UAS.h"
 #include <vector>
 #include <iostream>
 
 
+
+struct SimulationConfig
+{
+  UAS_operating_constraints operating_constraints;
+
+  UAS_state initial_state;
+
+  GPSSensor gps_sensor;
+
+  SimConfig simulation;
+
+  std::vector<Waypoint> checkpoints;
+
+  FollowerMethod follower_method;
+
+  RoutePlanner route_planner;
+
+  KalmanFilterState kalman;
+};
 
 class Simulation {
   public:

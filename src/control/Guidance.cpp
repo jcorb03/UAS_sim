@@ -1,8 +1,10 @@
 #include "uas_sim/control/Guidance.h"
 
 PathFollower::PathFollower(UAS_operating_constraints operating_constraints,
-  const std::vector<Waypoint>& waypoints):
-  operating_constraints_(operating_constraints), waypoints_(waypoints){
+  const std::vector<Waypoint>& waypoints,
+  const FollowerMethod& method):
+  operating_constraints_(operating_constraints), waypoints_(waypoints), 
+method_(method){
   
 }
 

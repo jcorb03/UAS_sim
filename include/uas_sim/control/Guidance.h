@@ -18,7 +18,8 @@ enum class FollowerMethod {
 class PathFollower {
 public:
 	PathFollower(UAS_operating_constraints operating_constraints,
-		const std::vector<Waypoint>& waypoints
+		const std::vector<Waypoint>& waypoints,
+		const FollowerMethod& method
 		);
 
 	void SetLookaheadTime(double lookahead_time) {

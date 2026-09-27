@@ -11,6 +11,10 @@ Simulation::Simulation(std::vector<UAS> uas_s , SimConfig sim_config) : UASs_(ua
 bool Simulation::run() {
   bool sim_done = false;
 
+  for (UAS& uas : UASs_) {
+    uas.planRoute();
+  }
+
   while (sim_time_ < sim_config_.sim_length && sim_done == false) {
 
     UAS_statuses.clear();

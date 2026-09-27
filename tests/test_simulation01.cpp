@@ -40,12 +40,19 @@ namespace UAS_tests {
         10.0     // waypoint tolerance [m]
     };
 
+    WorldBounds bounds{ -10, -10, 110.0, 110.0 };
+
+    ObstacleMap map(bounds, {}, {});
+
+    RoutePlanner planner(waypoints, map);
 
     UAS uas(
       constraints,
       waypoints,
       initial_state,
-      gps_sensor
+      gps_sensor,
+      FollowerMethod::DIRECT,
+      planner
     );
 
     KalmanFilterState kalman;

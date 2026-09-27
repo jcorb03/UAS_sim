@@ -5,21 +5,28 @@
 #include "uas_sim/sensors/GPSSensor.h"
 #include "uas_sim/control/Guidance.h"
 #include "uas_sim/estimation/UASEstimator.h"
+#include "uas_sim\map\ObstacleMap.h"
+#include "uas_sim\routeplanner\routeplanner.h"
 
 class UAS {
 public:
   UAS(const UAS_operating_constraints& operating_constraints,
     const std::vector<Waypoint>& waypoints,
-    UAS_state initial_state, GPSSensor gps_sensor);
+    UAS_state initial_state, GPSSensor gps_sensor,
+    FollowerMethod method, RoutePlanner planner);
 
   void initialiseKalman(const KalmanFilterState& kalman);
   void setWaypointTolerance(SimConfig sim_config);
   bool getObjective();
   bool step(SimConfig sim_config, double sim_time);
   std::vector<Waypoint> getWaypoints() const;
+  void planRoute();
   UAS_state getEstimatedState() const;
   
+  
 private:
+  RoutePlanner planner_;
+  ObstacleMap map_;
   PathFollower guidance_;
   Estimator estimator_;
   Dynamics dynamics_;

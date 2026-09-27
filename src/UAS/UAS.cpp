@@ -2,11 +2,13 @@
 
 UAS::UAS(const UAS_operating_constraints& operating_constraints,
   const std::vector<Waypoint>& waypoints,
-  UAS_state initial_state, GPSSensor gps_sensor) :
+  UAS_state initial_state, GPSSensor gps_sensor,
+  FollowerMethod method, RoutePlanner planner) :
   operating_constraints_(operating_constraints), waypoints_(waypoints),
   estimated_state_(initial_state), gps_sensor_(gps_sensor),
   dynamics_(operating_constraints, initial_state),
-  guidance_(operating_constraints_, waypoints)
+  guidance_(operating_constraints_, waypoints, method),
+  planner_(planner)
 {
   
 }
@@ -42,10 +44,13 @@ UAS_state UAS::getEstimatedState() const {
   return estimated_state_;
 }
 
+void UAS::planRoute() {
+  waypoints_ = planner_.Plan(Waypoint{ estimated_state_.x, estimated_state_.y });
+}
+
 bool UAS::step(SimConfig sim_config, double sim_time) {
   bool done = false;
-  
-    // 
+    
     done = getObjective();
     if (done == false) {
 
