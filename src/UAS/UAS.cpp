@@ -7,7 +7,7 @@ UAS::UAS(const UAS_operating_constraints& operating_constraints,
   operating_constraints_(operating_constraints), waypoints_(waypoints),
   estimated_state_(initial_state), gps_sensor_(gps_sensor),
   dynamics_(operating_constraints, initial_state),
-  guidance_(operating_constraints_, waypoints, method),
+  guidance_(operating_constraints_, method),
   planner_(planner)
 {
   

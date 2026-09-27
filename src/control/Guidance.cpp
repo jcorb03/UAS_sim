@@ -1,15 +1,17 @@
 #include "uas_sim/control/Guidance.h"
 
 PathFollower::PathFollower(UAS_operating_constraints operating_constraints,
-  const std::vector<Waypoint>& waypoints,
   const FollowerMethod& method):
-  operating_constraints_(operating_constraints), waypoints_(waypoints), 
-method_(method){
+  operating_constraints_(operating_constraints), method_(method){
   
 }
 
 UAS_command PathFollower::GetCommand(const UAS_state& current_state, 
   const std::vector<Waypoint>& waypoints) {
+
+  if (waypoints.empty()) {
+    throw std::invalid_argument("Path follower requires a non-empty route.");
+  }
   
   if (method_ == FollowerMethod::DIRECT) {
     return DirectCommand(current_state, waypoints.front());
@@ -52,9 +54,9 @@ UAS_command PathFollower::PPCommand(const UAS_state& current_state,
   Waypoint state_coords{ current_state.x, current_state.y };
   
   double min_dist = std::numeric_limits<double>::infinity();
-  int closest = 0;
+  std::size_t closest = 0;
 
-  for (int i = 0; i < waypoints_.size(); ++i) {
+  for (std::size_t i = 0; i < waypoints.size(); ++i) {
     
     double dist = helpers::distance(state_coords, waypoints.at(i));
 
@@ -72,7 +74,7 @@ UAS_command PathFollower::PPCommand(const UAS_state& current_state,
   bool set = false;
   Waypoint intercept{ 0.0,0.0 };
 
-  for (int i = closest; i < (waypoints_.size()); ++i) {
+  for (std::size_t i = closest; i < waypoints.size(); ++i) {
     if (helpers::distance(state_coords, waypoints.at(i))
          > lookahead_distance) {
       intercept = waypoints.at(i);
