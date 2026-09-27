@@ -42,6 +42,7 @@ add_executable(UAS_Sim
     "src/routeplanner/routeplanner.cpp" 
     "src/map/ObstacleMap.cpp" 
     "include/uas_sim/helperfunctions.h" 
+    "include/uas_sim/map/OccupancyGrid.h"
     "src/sensors/RangeSensor.cpp")
 
 target_include_directories(UAS_Sim

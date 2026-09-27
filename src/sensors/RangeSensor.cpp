@@ -11,7 +11,7 @@ void RangeSensor::getSurroundings(
 
   measurement_.clear();
   Waypoint point;
-
+  
   for (double bearing = state.heading - config_.field_of_view;
     bearing <= state.heading + config_.field_of_view;
     bearing += config_.angular_resolution) {
@@ -31,10 +31,12 @@ void RangeSensor::getSurroundings(
 
       if (!map.isPointFree(point)) {
         measured_range = range;
+
         break;
       }
     }
 
+    
     measurement_.push_back(
       RangeMeasurement{
           measured_range,
