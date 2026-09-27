@@ -58,13 +58,15 @@ namespace SimulationCatalogue {
 
     ObstacleMap map(bounds, {}, {});
 
+    RoutePlanner planner(waypoints, map);
+
     UAS uas(
       constraints,
       waypoints,
       initial_state,
       gps_sensor,
-      map,
-      FollowerMethod::DIRECT
+      FollowerMethod::DIRECT,
+      planner
     );
 
     UAS second_uas(
@@ -72,8 +74,8 @@ namespace SimulationCatalogue {
       waypoints,
       second_initial_state,
       gps_sensor,
-      map,
-      FollowerMethod::DIRECT
+      FollowerMethod::DIRECT,
+      planner
     );
 
     KalmanFilterState kalman;
@@ -128,7 +130,7 @@ namespace SimulationCatalogue {
     std::vector<Waypoint> path = planner.Plan(Waypoint(10.0, 90.0));
 
     PathFollower guidance(constraints,
-      path, FollowerMethod::PURE_PURSUIT);
+       FollowerMethod::PURE_PURSUIT);
 
     UAS_state state(10.0, 90.0, 5.0, 3.14);
 
