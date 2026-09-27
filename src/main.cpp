@@ -16,14 +16,9 @@ int main() {
   };
 
   RoutePlanner planner = Courses::Course1();
-  std::vector<Waypoint> path = planner.Plan(Waypoint(10.0, 90.0));
 
-  PathFollower guidance(constraints,
-    path, FollowerMethod::PURE_PURSUIT);
 
   UAS_state state(10.0, 90.0, 5.0, 3.14);
-
-  guidance.SetMethod(FollowerMethod::PURE_PURSUIT);
 
   GPSSensor gps_sensor(
     1,    // noise standard deviation [m]
@@ -49,25 +44,11 @@ int main() {
     checkpoints,
     state,
     gps_sensor,
-    FollowerMethod::DIRECT,
+    FollowerMethod::PURE_PURSUIT,
     planner
   );
 
   KalmanFilterState kalman;
-
-  kalman.state_estimate.setZero();
-
-  kalman.P = Eigen::Matrix4d::Identity();
-
-  kalman.A = Eigen::Matrix4d::Identity();
-
-  kalman.Q = Eigen::Matrix4d::Zero();
-
-  kalman.H.setZero();
-
-  kalman.R = Eigen::Matrix2d::Identity() * 4.0;
-
-  kalman.K.setZero();
 
   uas.initialiseKalman(kalman);
 
@@ -79,14 +60,10 @@ int main() {
   );
 
   bool done = simulation.run();
- 
-  std::vector<double> time_history = simulation.getTimeHistory();
 
-
-  std::vector<std::vector<UAS_state>> estimation_history = simulation.getStateEstimateHistory();
-
-
-  bool made = results::makeCsv(time_history, estimation_history);
+  bool made = results::makeCsv(
+    simulation.getTimeHistory(), 
+    simulation.getStateEstimateHistory());
   std::cout << "Simulation complete: " << done << "\n"
     << "CSV status: " << made << '\n';
 

@@ -5,7 +5,8 @@
 #include <numbers>
 #include <iostream>
 
-struct KalmanFilterState {
+struct KalmanFilterState
+{
   // State estimate: [x, y, velocity, heading]
   Eigen::Vector4d state_estimate;
 
@@ -26,6 +27,24 @@ struct KalmanFilterState {
 
   // Kalman gain
   Eigen::Matrix<double, 4, 2> K;
+
+  KalmanFilterState()
+  {
+    state_estimate.setZero();
+
+    P.setIdentity();
+
+    A.setIdentity();
+
+    Q.setZero();
+
+    H.setZero();
+
+    R.setIdentity();
+    R *= 4.0;
+
+    K.setZero();
+  }
 };
 
 
