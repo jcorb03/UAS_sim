@@ -6,6 +6,7 @@
 #include "uas_sim/estimation/UASEstimator.h"
 #include "uas_sim/routeplanner/routeplanner.h"
 #include "uas_sim/UAS/UAS.h"
+#include "uas_sim/map/OccupancyGrid.h"
 #include <vector>
 #include <iostream>
 
@@ -28,16 +29,18 @@ struct SimulationConfig
   RoutePlanner route_planner;
 
   KalmanFilterState kalman;
+
+  OccupancyGrid grid;
 };
 
 class Simulation {
+
   public:
-    Simulation(std::vector<UAS> uas_s , SimConfig sim_config);
+    explicit Simulation(const SimulationConfig& config);
     bool run();
     std::vector<double> getTimeHistory() const;
     std::vector<std::vector<UAS_state>> getStateEstimateHistory() const;
     
-
 private:
   std::vector<UAS> UASs_;
   double sim_time_ = 0;

@@ -3,6 +3,10 @@
 #include <fstream>
 #include <iostream>
 
+#ifndef UAS_SIM_PROJECT_DIR
+#define UAS_SIM_PROJECT_DIR "."
+#endif
+
 bool ObstacleMap::isPointFree(const Waypoint& to) const{
 
   for (const CircleObstacle& circle : circles) {

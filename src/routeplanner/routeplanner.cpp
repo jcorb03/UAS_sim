@@ -3,6 +3,10 @@
 #include <fstream>
 #include <iostream>
 
+#ifndef UAS_SIM_PROJECT_DIR
+#define UAS_SIM_PROJECT_DIR "."
+#endif
+
 RoutePlanner::RoutePlanner(std::vector<Waypoint> checkpoints, ObstacleMap obstacle_map): checkpoints_(checkpoints),
 obstacle_map_(obstacle_map){
 

@@ -46,15 +46,6 @@ namespace UAS_tests {
 
     RoutePlanner planner(waypoints, map);
 
-    UAS uas(
-      constraints,
-      waypoints,
-      initial_state,
-      gps_sensor,
-      FollowerMethod::DIRECT,
-      planner
-    );
-
     KalmanFilterState kalman;
 
     kalman.state_estimate.setZero();
@@ -71,14 +62,19 @@ namespace UAS_tests {
 
     kalman.K.setZero();
 
-    uas.initialiseKalman(kalman);
+    SimulationConfig config{
+      constraints,
+      initial_state,
+      gps_sensor,
+      sim_config,
+      waypoints,
+      FollowerMethod::DIRECT,
+      planner,
+      kalman,
+      OccupancyGrid{ bounds, 1.0 }
+    };
 
-    std::vector<UAS> Uas_vec = { uas };
-
-    Simulation simulation(
-      Uas_vec,
-      sim_config
-    );
+    Simulation simulation(config);
 
     EXPECT_TRUE(simulation.run());
     

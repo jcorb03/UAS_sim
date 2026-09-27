@@ -36,13 +36,6 @@ namespace SimulationCatalogue {
         0.0     // heading [rad]
     };
 
-    UAS_state second_initial_state{
-        -20.0,  // x [m]
-        0.0,    // y [m]
-        5.0,    // velocity [m/s]
-        0.0     // heading [rad]
-    };
-
     GPSSensor gps_sensor(
       1,    // noise standard deviation [m]
       0.1,     // update rate [Hz]
@@ -60,24 +53,6 @@ namespace SimulationCatalogue {
 
     RoutePlanner planner(waypoints, map);
 
-    UAS uas(
-      constraints,
-      waypoints,
-      initial_state,
-      gps_sensor,
-      FollowerMethod::DIRECT,
-      planner
-    );
-
-    UAS second_uas(
-      constraints,
-      waypoints,
-      second_initial_state,
-      gps_sensor,
-      FollowerMethod::DIRECT,
-      planner
-    );
-
     KalmanFilterState kalman;
 
     kalman.state_estimate.setZero();
@@ -94,15 +69,19 @@ namespace SimulationCatalogue {
 
     kalman.K.setZero();
 
-    uas.initialiseKalman(kalman);
-    second_uas.initialiseKalman(kalman);
+    SimulationConfig config{
+      constraints,
+      initial_state,
+      gps_sensor,
+      sim_config,
+      waypoints,
+      FollowerMethod::DIRECT,
+      planner,
+      kalman,
+      OccupancyGrid{ bounds, 1.0 }
+    };
 
-    std::vector<UAS> Uas_vec = { uas, second_uas };
-
-    Simulation simulation(
-      Uas_vec,
-      sim_config
-    );
+    Simulation simulation(config);
 
     bool done = simulation.run();
 
@@ -127,14 +106,7 @@ namespace SimulationCatalogue {
     };
 
     RoutePlanner planner = Courses::Course1();
-    std::vector<Waypoint> path = planner.Plan(Waypoint(10.0, 90.0));
-
-    PathFollower guidance(constraints,
-       FollowerMethod::PURE_PURSUIT);
-
     UAS_state state(10.0, 90.0, 5.0, 3.14);
-
-    guidance.SetMethod(FollowerMethod::PURE_PURSUIT);
 
     GPSSensor gps_sensor(
       1,    // noise standard deviation [m]
@@ -155,15 +127,6 @@ namespace SimulationCatalogue {
         Waypoint(40.0, 90.0),
     };
 
-    UAS uas(
-      constraints,
-      checkpoints,
-      state,
-      gps_sensor,
-      FollowerMethod::DIRECT,
-      planner
-    );
-
     KalmanFilterState kalman;
 
     kalman.state_estimate.setZero();
@@ -180,14 +143,21 @@ namespace SimulationCatalogue {
 
     kalman.K.setZero();
 
-    uas.initialiseKalman(kalman);
+    WorldBounds bounds{ 0.0, 0.0, 100.0, 100.0 };
 
-    std::vector<UAS> Uas_vec = { uas };
+    SimulationConfig config{
+      constraints,
+      state,
+      gps_sensor,
+      sim_config,
+      checkpoints,
+      FollowerMethod::PURE_PURSUIT,
+      planner,
+      kalman,
+      OccupancyGrid{ bounds, 1.0 }
+    };
 
-    Simulation simulation(
-      Uas_vec,
-      sim_config
-    );
+    Simulation simulation(config);
 
     bool done = simulation.run();
 

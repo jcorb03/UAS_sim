@@ -1,10 +1,19 @@
 #include "uas_sim/Simulation.h"
 
-Simulation::Simulation(std::vector<UAS> uas_s , SimConfig sim_config) : UASs_(uas_s), sim_config_(sim_config)
+Simulation::Simulation(const SimulationConfig& config)
+  : sim_config_(config.simulation)
 {
-  for (UAS& uas : UASs_) {
-    uas.setWaypointTolerance(sim_config_);
-  }
+  UASs_.emplace_back(
+    config.operating_constraints,
+    config.checkpoints,
+    config.initial_state,
+    config.gps_sensor,
+    config.follower_method,
+    config.route_planner
+  );
+
+  UASs_.front().initialiseKalman(config.kalman);
+  UASs_.front().setWaypointTolerance(sim_config_);
   estimation_history_.resize(UASs_.size());
 }
 
