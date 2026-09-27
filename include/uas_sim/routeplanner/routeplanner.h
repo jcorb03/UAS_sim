@@ -24,6 +24,8 @@ public:
 
   std::vector<Waypoint> Plan(const Waypoint& start);
 
+  const ObstacleMap& getMap() const;
+
   void writePathCSV(const std::vector<Waypoint>& overall_path) const;
 
 private:

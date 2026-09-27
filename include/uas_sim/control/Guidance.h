@@ -39,5 +39,5 @@ private:
 
 	FollowerMethod method_ = FollowerMethod::DIRECT;
 	UAS_operating_constraints operating_constraints_;
-	double lookahead_time_ = 2.0;
+	double lookahead_time_ = 0.5;
 };

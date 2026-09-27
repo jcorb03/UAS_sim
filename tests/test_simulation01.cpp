@@ -66,17 +66,28 @@ namespace UAS_tests {
       constraints,
       initial_state,
       gps_sensor,
+      std::nullopt,
       sim_config,
       waypoints,
       FollowerMethod::DIRECT,
       planner,
       kalman,
-      OccupancyGrid{ bounds, 1.0 }
+      NavigationMode::KnownMap,
+      1.0
     };
 
     Simulation simulation(config);
 
+    EXPECT_FALSE(simulation.hasOccupancyGrid());
     EXPECT_TRUE(simulation.run());
+
+    config.range_sensor_config = RangeSensorConfig{
+      25.0, 1.0, 0.1, 1.0, 0.1
+    };
+    config.navigation_mode = NavigationMode::UnknownMap;
+
+    Simulation unknown_map_simulation(config);
+    EXPECT_TRUE(unknown_map_simulation.hasOccupancyGrid());
     
     
   }

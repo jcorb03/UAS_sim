@@ -313,3 +313,7 @@ void RoutePlanner::writePathCSV(const std::vector<Waypoint>& overall_path) const
   }
 
 }
+
+const ObstacleMap& RoutePlanner::getMap() const {
+  return obstacle_map_;
+}

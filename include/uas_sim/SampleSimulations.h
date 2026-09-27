@@ -73,12 +73,14 @@ namespace SimulationCatalogue {
       constraints,
       initial_state,
       gps_sensor,
+      std::nullopt,
       sim_config,
       waypoints,
       FollowerMethod::DIRECT,
       planner,
       kalman,
-      OccupancyGrid{ bounds, 1.0 }
+      NavigationMode::KnownMap,
+      1.0
     };
 
     Simulation simulation(config);
@@ -149,12 +151,14 @@ namespace SimulationCatalogue {
       constraints,
       state,
       gps_sensor,
+      std::nullopt,
       sim_config,
       checkpoints,
       FollowerMethod::PURE_PURSUIT,
       planner,
       kalman,
-      OccupancyGrid{ bounds, 1.0 }
+      NavigationMode::KnownMap,
+      1.0
     };
 
     Simulation simulation(config);

@@ -5,15 +5,22 @@
 #include "uas_sim/sensors/GPSSensor.h"
 #include "uas_sim/control/Guidance.h"
 #include "uas_sim/estimation/UASEstimator.h"
-#include "uas_sim\map\ObstacleMap.h"
+#include "uas_sim\map\OccupancyGrid.h"
 #include "uas_sim\routeplanner\routeplanner.h"
 
 class UAS {
 public:
-  UAS(const UAS_operating_constraints& operating_constraints,
-    const std::vector<Waypoint>& waypoints,
-    UAS_state initial_state, GPSSensor gps_sensor,
-    FollowerMethod method, RoutePlanner planner);
+  UAS(
+    const UAS_operating_constraints& constraints,
+    const std::vector<Waypoint>& checkpoints,
+    const UAS_state& initial_state,
+    const GPSSensor& gps_sensor,
+    FollowerMethod follower_method,
+    const RoutePlanner& route_planner,
+    std::optional<RangeSensorConfig> range_sensor_config = std::nullopt,
+    bool use_occupancy_grid = false,
+    double occupancy_grid_resolution = 1.0
+  );
 
   void initialiseKalman(const KalmanFilterState& kalman);
   void setWaypointTolerance(SimConfig sim_config);
@@ -22,9 +29,13 @@ public:
   std::vector<Waypoint> getWaypoints() const;
   void planRoute();
   UAS_state getEstimatedState() const;
+  bool hasOccupancyGrid() const;
+  OccupancyGrid getOccupancyGrid() const;
   
   
 private:
+  std::optional<OccupancyGrid> occupancy_grid_;
+  std::optional<RangeSensor> range_sensor_;
   RoutePlanner planner_;
   ObstacleMap map_;
   PathFollower guidance_;

@@ -6,11 +6,14 @@
 #include "uas_sim/estimation/UASEstimator.h"
 #include "uas_sim/routeplanner/routeplanner.h"
 #include "uas_sim/UAS/UAS.h"
-#include "uas_sim/map/OccupancyGrid.h"
 #include <vector>
 #include <iostream>
 
 
+enum class NavigationMode {
+  KnownMap,
+  UnknownMap
+};
 
 struct SimulationConfig
 {
@@ -19,6 +22,7 @@ struct SimulationConfig
   UAS_state initial_state;
 
   GPSSensor gps_sensor;
+  std::optional<RangeSensorConfig> range_sensor_config;
 
   SimConfig simulation;
 
@@ -30,7 +34,9 @@ struct SimulationConfig
 
   KalmanFilterState kalman;
 
-  OccupancyGrid grid;
+  NavigationMode navigation_mode = NavigationMode::KnownMap;
+
+  double occupancy_grid_resolution = 1.0;
 };
 
 class Simulation {
@@ -38,8 +44,10 @@ class Simulation {
   public:
     explicit Simulation(const SimulationConfig& config);
     bool run();
+    bool hasOccupancyGrid() const;
     std::vector<double> getTimeHistory() const;
     std::vector<std::vector<UAS_state>> getStateEstimateHistory() const;
+    OccupancyGrid getOccupancyGrid() const;
     
 private:
   std::vector<UAS> UASs_;

@@ -2,6 +2,10 @@
 #include "uas_sim/map/ObstacleMap.h"
 #include "uas_sim/sensors/RangeSensor.h"
 #include <cmath>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+
 
 enum class OccupancyState {
   Unknown,
@@ -43,6 +47,22 @@ struct OccupancyGrid {
     return { n,m };
   }
 
+  std::pair<double, double>
+    gridtoWorld(std::pair<std::size_t, std::size_t> index) const {
+    
+    const auto x = 
+      static_cast<double>(index.first) * resolution_ + bounds.min_x;
+    const auto y = 
+      static_cast<double>(index.second) * resolution_ + bounds.min_y;
+    
+    return { x,y };
+  }
+
+  bool contains(const Waypoint& point) const {
+    return point.x >= bounds.min_x && point.x < bounds.max_x &&
+      point.y >= bounds.min_y && point.y < bounds.max_y;
+  }
+
   void UpdateGrid(const UAS_state& state,
     const std::vector<RangeMeasurement>& measurements,
     double sensor_max_range) {
@@ -57,6 +77,10 @@ struct OccupancyGrid {
         point.x = state.x + range * std::sin(measurement.bearing);
         point.y = state.y + range * std::cos(measurement.bearing);
 
+        if (!contains(point)) {
+          break;
+        }
+
         //Nearest point
         std::pair<std::size_t, std::size_t> index = worldToGrid(point);
 
@@ -69,10 +93,35 @@ struct OccupancyGrid {
         point.x = state.x + measurement.range * std::sin(measurement.bearing);
         point.y = state.y + measurement.range * std::cos(measurement.bearing);
 
+        if (!contains(point)) {
+          continue;
+        }
+
         //Nearest point
         std::pair<std::size_t, std::size_t> index = worldToGrid(point);
         
         grid.at(index.first).at(index.second) = OccupancyState::Occupied;
+      }
+    }
+  }
+
+  void WriteToCsv() const {
+    const std::filesystem::path grid_path =
+      std::filesystem::path{ UAS_SIM_PROJECT_DIR } / "results" "/grid.csv";
+    std::ofstream grid_file(grid_path);
+
+    grid_file << "X,Y,Status\n";
+
+    for (std::size_t i = 0; i<grid.size(); ++i ){
+      for (std::size_t j = 0; j < grid.at(0).size(); ++j) {
+        std::pair<double, double> coords = gridtoWorld({ i,j });
+
+        int status = static_cast<int>(grid.at(i).at(j));
+
+        grid_file << coords.first << ","
+          << coords.second << ","
+          << status  << "\n";
+
       }
     }
   }

@@ -49,3 +49,7 @@ void RangeSensor::getSurroundings(
 std::vector<RangeMeasurement> RangeSensor::getMeasurement() const{
   return measurement_;
 }
+
+double RangeSensor::getMaxRange() const {
+  return config_.max_range;
+}

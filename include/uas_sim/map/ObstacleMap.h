@@ -31,7 +31,7 @@ struct ObstacleMap {
     std::vector<CircleObstacle> circles;
     std::vector<RectangleObstacle> rectangles;
    
-    double safety_margin = 5.0;
+    double safety_margin = 2.0;
 
     bool isPointFree(const Waypoint& to) const;
 

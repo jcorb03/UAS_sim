@@ -24,6 +24,7 @@ public:
     const ObstacleMap& map);
 
   std::vector<RangeMeasurement> getMeasurement() const;
+  double getMaxRange() const;
 
 private:
   RangeSensorConfig config_;
