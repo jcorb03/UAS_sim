@@ -41,7 +41,7 @@ struct SimulationConfig
 
 class Simulation {
 
-  public:
+public:
     explicit Simulation(const SimulationConfig& config);
     bool run();
     bool hasOccupancyGrid() const;

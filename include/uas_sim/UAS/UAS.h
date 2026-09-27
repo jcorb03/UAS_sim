@@ -1,12 +1,13 @@
 #pragma once
+#include <optional>
 #include <vector>
 #include "uas_sim/UAS_structs.h"
 #include "uas_sim/dynamics/dynamics.h"
 #include "uas_sim/sensors/GPSSensor.h"
 #include "uas_sim/control/Guidance.h"
 #include "uas_sim/estimation/UASEstimator.h"
-#include "uas_sim\map\OccupancyGrid.h"
-#include "uas_sim\routeplanner\routeplanner.h"
+#include "uas_sim/map/OccupancyGrid.h"
+#include "uas_sim/routeplanner/routeplanner.h"
 
 class UAS {
 public:

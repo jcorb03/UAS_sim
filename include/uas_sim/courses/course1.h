@@ -26,6 +26,7 @@ namespace Courses {
 
     std::vector<Waypoint> checkpoints{
       Waypoint(5.0, 5.0),
+      Waypoint(25.0,5.0),
       Waypoint(60.0, 35.0),
       Waypoint(80.0, 65.0),
       Waypoint(40.0, 90.0),

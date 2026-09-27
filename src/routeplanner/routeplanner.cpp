@@ -80,6 +80,7 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
               bounds.min_y + dis(gen) * dy
           },
           -1,
+          -1,
           0.0
       };
 

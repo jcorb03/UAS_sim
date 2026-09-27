@@ -124,7 +124,7 @@ bool UAS::step(SimConfig sim_config, double sim_time) {
       //Get range measurement if we're using the occupancy grid
 
       if (occupancy_grid_.has_value() && range_sensor_.has_value()) {
-        range_sensor_->getSurroundings(estimated_state_, planner_.getMap());
+        range_sensor_->getSurroundings(dynamics_.getState(), planner_.getMap());
         occupancy_grid_->UpdateGrid(
           estimated_state_,
           range_sensor_->getMeasurement(),

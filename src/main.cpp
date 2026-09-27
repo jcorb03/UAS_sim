@@ -15,7 +15,7 @@ int main() {
      2.0,    // min_speed [m/s]
      5.0,   // max_speed [m/s]
      2.0,    // max_accel [m/s^2]
-     0.5     // max_turn_rate [rad/s]
+     1.0     // max_turn_rate [rad/s]
   };
 
   RoutePlanner planner = Courses::Course1();
@@ -43,6 +43,7 @@ int main() {
 
   std::vector<Waypoint> checkpoints{
       Waypoint(5.0, 5.0),
+      Waypoint(25.0,5.0),
       Waypoint(60.0, 35.0),
       Waypoint(80.0, 65.0),
       Waypoint(40.0, 90.0),

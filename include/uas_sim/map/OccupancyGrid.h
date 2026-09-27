@@ -5,6 +5,14 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <utility>
+#include <vector>
+
+// CMake sets this to the source directory.  The fallback keeps this header
+// usable from Visual Studio's normal compiler and IntelliSense as well.
+#ifndef UAS_SIM_PROJECT_DIR
+#define UAS_SIM_PROJECT_DIR "."
+#endif
 
 
 enum class OccupancyState {
@@ -107,7 +115,7 @@ struct OccupancyGrid {
 
   void WriteToCsv() const {
     const std::filesystem::path grid_path =
-      std::filesystem::path{ UAS_SIM_PROJECT_DIR } / "results" "/grid.csv";
+      std::filesystem::path{ UAS_SIM_PROJECT_DIR } / "results" / "grid.csv";
     std::ofstream grid_file(grid_path);
 
     grid_file << "X,Y,Status\n";

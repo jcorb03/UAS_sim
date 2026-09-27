@@ -65,25 +65,19 @@ UAS_command PathFollower::PPCommand(const UAS_state& current_state,
       min_dist = dist;
     }
   }
-  Waypoint nearest = waypoints.at(closest);
 
-
-  // Find intercept points (next point in waypoints which is 
-  // larger than lookahead distance)
+  // Find the first forward path segment which reaches the lookahead circle.
+  // Starting at closest + 1 means the previous endpoint always exists.
   double lookahead_distance = current_state.v * lookahead_time_;
-  bool set = false;
-  Waypoint intercept{ 0.0,0.0 };
+  Waypoint intercept = waypoints.back();
 
-  for (std::size_t i = closest; i < waypoints.size(); ++i) {
+  for (std::size_t i = closest + 1; i < waypoints.size(); ++i) {
     if (helpers::distance(state_coords, waypoints.at(i))
          > lookahead_distance) {
-      intercept = waypoints.at(i);
-      set = true;
+      intercept = helpers::intercept(state_coords, lookahead_distance,
+        waypoints.at(i - 1), waypoints.at(i));
       break;
     }
-  }
-  if (!set) {
-    intercept = nearest;
   }
 
   //Calculate bearing to lookahead point

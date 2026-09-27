@@ -6,6 +6,8 @@
 #include <cmath>
 #include <numbers>
 #include <algorithm>
+#include <limits>
+#include <vector>
 
 
 //Produces UAS_command to follow path from route planner
@@ -22,7 +24,7 @@ public:
 		);
 
 	void SetLookaheadTime(double lookahead_time) {
-		lookahead_time_ = std::max(1.0, lookahead_time);
+		lookahead_time_ = std::max(0.1, lookahead_time);
 	}
 	void SetMethod(FollowerMethod method);
 
@@ -39,5 +41,5 @@ private:
 
 	FollowerMethod method_ = FollowerMethod::DIRECT;
 	UAS_operating_constraints operating_constraints_;
-	double lookahead_time_ = 0.5;
+	double lookahead_time_ = 0.1;
 };

@@ -79,8 +79,8 @@ for _,row in checkpoints_df.iterrows():
     )
 
 #add planned path to plot
-ax.plot(path_df["X"],path_df["Y"], color = "green", label = "path")
-ax.plot(trajectory_df["UAV0_X"],trajectory_df["UAV0_Y"], color = "orange", label = "trajectory")
+ax.scatter(path_df["X"],path_df["Y"], color = "green", label = "path", s = 1)
+ax.scatter(trajectory_df["UAV0_X"],trajectory_df["UAV0_Y"], color = "orange", label = "trajectory", s= 1)
 ax.legend()
 # Keep x and y scales equal
 ax.set_aspect("equal")
