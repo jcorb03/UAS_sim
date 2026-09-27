@@ -1,34 +1,43 @@
-# UAS_Sim
+# UAS Sim
 
-Basic UAS/Drone 2D C++ simulation platform
+Basic 2D UAS/drone simulation platform written in C++.
 
-Latest Update v1.3 Object Avoidance
+**Latest update:** v1.3 — Object avoidance
 
-## Current Capabilities
+## Current capabilities
 
-- Waypoint Navigation using RRT path planning and Pure Pursuit Path following
-- Configurable GPS sensor (Noise, Update Frequency)
+- Waypoint navigation using RRT* path planning and Pure Pursuit path following
+- Configurable GPS sensor noise and update frequency
 - Extended Kalman Filter state estimation
-- Basic UAS capability configuration (speed range and acceleration capability)
+- Configurable UAS speed, acceleration, and turn-rate limits
 
-## Future Plans 
+## Future plans
 
-- IMU sensor and sensor fusion capabilities
+- IMU sensor and sensor-fusion capabilities
 - DDIL environment communication simulation
-- Threat Detection and Task types for evasive movement & engagements
+- Threat detection and task types for evasive movement and engagements
 
-## To run (Visual Studio) using CMake
-From project root
+## Run with Visual Studio and CMake
 
-- Build solution:
+Select a simulation in `main.cpp` from `SimulationCatalogue`:
+
+- `WaypointNavigation` — Two UAVs navigate square waypoint routes using simple navigation.
+- `ObstacleCourseNavigation` — One UAV navigates a static obstacle course using RRT* and Pure Pursuit.
+
+From the project root:
+
+```powershell
 cmake --build out/build/x64-debug --target UAS_Sim
-
-- Run Executable:
 .\out\build\x64-debug\UAS_Sim.exe
+```
 
-- Visualisations: 
-python python/plot_results.py
+## Visualisation
 
-## Example Simulation Result
+```powershell
+python python/plot_results.py  # Trajectory GIF
+python python/plot_map.py      # Obstacles, planned route, and trajectory
+```
 
-![UAS Trajectory](results/example_map.png)
+## Example result
+
+![UAS trajectory](results/example_map.png)
