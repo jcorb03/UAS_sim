@@ -7,7 +7,7 @@
 #define UAS_SIM_PROJECT_DIR "."
 #endif
 
-bool ObstacleMap::isPointFree(const Waypoint& to) const{
+bool ObstacleMap::isPointFree(const Waypoint& to, double safety_margin) const{
 
   for (const CircleObstacle& circle : circles) {
     bool hit_circle = std::sqrt((to.x - circle.x) * (to.x - circle.x)
@@ -51,7 +51,8 @@ double ObstacleMap::distance(
   return std::sqrt(dx * dx + dy * dy);
 }
 
-bool ObstacleMap::isSegmentFree(const Waypoint& from, const Waypoint& to) const {
+bool ObstacleMap::isSegmentFree(const Waypoint& from, const Waypoint& to,
+   double safety_margin) const {
 
   int N = 100;
   Waypoint point = from;
@@ -64,7 +65,7 @@ bool ObstacleMap::isSegmentFree(const Waypoint& from, const Waypoint& to) const 
     point.x = from.x + fraction * dx;
     point.y = from.y + fraction * dy;
 
-    if (!isPointFree(point)) {
+    if (!isPointFree(point, safety_margin)) {
       return false;
     }
   }

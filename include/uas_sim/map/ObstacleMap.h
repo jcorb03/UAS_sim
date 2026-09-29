@@ -30,14 +30,15 @@ struct ObstacleMap {
     WorldBounds bounds;
     std::vector<CircleObstacle> circles;
     std::vector<RectangleObstacle> rectangles;
-   
-    double safety_margin = 2.0;
 
-    bool isPointFree(const Waypoint& to) const;
+    double safety_margin = 5.0;
+
+    bool isPointFree(const Waypoint& to, double safety_margin) const;
 
     bool isSegmentFree(
         const Waypoint& from,
-        const Waypoint& to) const;
+        const Waypoint& to,
+       double safety_margin) const;
 
     void writeToCSV() const;
 

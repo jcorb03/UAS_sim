@@ -29,7 +29,7 @@ void RangeSensor::getSurroundings(
       point.x = state.x + range * std::sin(wrapped_bearing);
       point.y = state.y + range * std::cos(wrapped_bearing);
 
-      if (!map.isPointFree(point)) {
+      if (!map.isPointFree(point, 0.0)) {
         measured_range = range;
 
         break;

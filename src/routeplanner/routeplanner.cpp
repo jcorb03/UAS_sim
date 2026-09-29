@@ -127,10 +127,10 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
       }
 
       // Check whether the new node and connecting segment are free
-      if (!obstacle_map_.isPointFree(x_new.coords) ||
+      if (!obstacle_map_.isPointFree(x_new.coords, 5.0) ||
         !obstacle_map_.isSegmentFree(
           nodes.at(nearest_index).coords,
-          x_new.coords))
+          x_new.coords, getMap().safety_margin))
       {
         continue;
       }
@@ -184,7 +184,7 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
         if (candidate_cost < best_cost &&
           obstacle_map_.isSegmentFree(
             nodes.at(node_index).coords,
-            x_new.coords))
+            x_new.coords, getMap().safety_margin))
         {
           best_cost = candidate_cost;
           best_parent_index = node_index;
@@ -220,7 +220,7 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
         if (candidate_cost < nodes.at(node_index).cost &&
           obstacle_map_.isSegmentFree(
             nodes.at(new_node_index).coords,
-            nodes.at(node_index).coords))
+            nodes.at(node_index).coords, getMap().safety_margin))
         {
           nodes.at(node_index).parent =
             new_node_index;
@@ -244,7 +244,7 @@ std::vector<Waypoint> RoutePlanner::plan_RRT_route(Waypoint start)
       if (goal_distance < goal_tolerance &&
         obstacle_map_.isSegmentFree(
           x_new.coords,
-          goal))
+          goal, getMap().safety_margin))
       {
         const double goal_cost =
           x_new.cost + goal_distance;
