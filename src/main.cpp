@@ -78,7 +78,7 @@ int main() {
     planner,
     kalman,
     NavigationMode::UnknownMap,
-    1.0
+    0.1
   };
 
   Simulation simulation(config);

@@ -11,15 +11,15 @@ bool ObstacleMap::isPointFree(const Waypoint& to, double safety_margin) const{
 
   for (const CircleObstacle& circle : circles) {
     bool hit_circle = std::sqrt((to.x - circle.x) * (to.x - circle.x)
-      + (to.y - circle.y) * (to.y - circle.y)) < (circle.radius+safety_margin);
+      + (to.y - circle.y) * (to.y - circle.y)) <= (circle.radius+safety_margin);
     if (hit_circle) {
       return false;
     }
   }
 
   for (const RectangleObstacle& obstacle : rectangles) {
-    bool hit_rec = (to.x > obstacle.min_x && to.y > obstacle.min_y &&
-      to.x < obstacle.max_x && to.y < obstacle.max_y);
+    bool hit_rec = (to.x >= obstacle.min_x && to.y >= obstacle.min_y &&
+      to.x <= obstacle.max_x && to.y <= obstacle.max_y);
     double dist = distance(to, obstacle);
     if (hit_rec || (dist < safety_margin) ){
       return false;

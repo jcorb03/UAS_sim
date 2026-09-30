@@ -12,6 +12,12 @@ namespace helpers {
       + (one.y - two.y) * (one.y - two.y));
   }
 
+  inline double distance(const std::pair<double, double>& one,
+    const std::pair<double, double>& two) {
+    return std::sqrt((one.first - two.first) * (one.first - two.first)
+      + (one.second - two.second) * (one.second - two.second));
+  }
+
   template <typename T>
 
   double bearing(T target, T current) {
