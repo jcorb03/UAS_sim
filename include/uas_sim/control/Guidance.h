@@ -41,5 +41,7 @@ private:
 
 	FollowerMethod method_ = FollowerMethod::DIRECT;
 	UAS_operating_constraints operating_constraints_;
-	double lookahead_time_ = 0.1;
+	// Grid routes are sampled at roughly one metre, so a sub-metre look-ahead
+	// makes pure pursuit chase individual cells and oscillate at corners.
+	double lookahead_time_ = 1.0;
 };

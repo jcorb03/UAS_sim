@@ -159,7 +159,7 @@ bool GridPlanner::FindFrontiers(const OccupancyGrid& occupancy_grid,
       if (!costmap.isTraversable(cell)) {
         continue;
       }
-      GridIndex cell = { i,j };
+      
       for (std::pair<int, int>& ne : cardinal_ne) {
 
         GridIndex neighbour{
@@ -255,7 +255,14 @@ GridIndex GridPlanner::NavigateTo(const Costmap& costmap, GridIndex start, GridI
 
   double best_score = -std::numeric_limits<double>::infinity();
   PlanResult best_route{};
+  double fallback_score = -std::numeric_limits<double>::infinity();
+  PlanResult fallback_route{};
+  GridIndex fallback_target = to;
+  bool found_goal_progressing_frontier = false;
   GridIndex navigate_to = to;
+  const double start_goal_distance = Heuristic(
+    start, to, costmap.resolution_
+  );
 
   for (Frontier& frontier : frontiers_) {
     
@@ -300,18 +307,49 @@ GridIndex GridPlanner::NavigateTo(const Costmap& costmap, GridIndex start, GridI
         continue;
       }
 
-      int information_gain = frontier.cells.size();
-      double cost = route_.total_cost;
+      const double information_gain = static_cast<double>(frontier.cells.size());
+      const double path_cost = route_.total_cost;
+      const double frontier_goal_distance = Heuristic(
+        closest_to_centroid, to, costmap.resolution_
+      );
+      const double goal_progress = start_goal_distance - frontier_goal_distance;
 
-      double score = information_gain / (cost + 1e-3) -
-        Heuristic(closest_to_centroid, to, costmap.resolution_);
-      
-      if (score > best_score) {
-        best_score = score;
-        best_route = route_;
-        navigate_to = closest_to_centroid;
+      // Prefer frontiers that make useful progress toward the active mission
+      // goal for each metre of path travelled.  This prevents an old, highly
+      // visible frontier near the start from winning solely because it is
+      // geographically closer to the next goal.
+      if (goal_progress > 0.0) {
+        const double score =
+          goal_progress / (path_cost + costmap.resolution_) +
+          0.05 * std::log1p(information_gain);
+
+        if (score > best_score) {
+          best_score = score;
+          best_route = route_;
+          navigate_to = closest_to_centroid;
+          found_goal_progressing_frontier = true;
+        }
+      } else {
+        // A temporary detour can be necessary when an obstacle blocks every
+        // frontier that moves directly toward the goal.  Keep the best such
+        // candidate as a fallback rather than declaring exploration failed.
+        const double score =
+          information_gain / (path_cost + costmap.resolution_) -
+          frontier_goal_distance;
+
+        if (score > fallback_score) {
+          fallback_score = score;
+          fallback_route = route_;
+          fallback_target = closest_to_centroid;
+        }
       }
   };
+
+  if (!found_goal_progressing_frontier) {
+    best_route = fallback_route;
+    navigate_to = fallback_target;
+  }
+
   route_ = best_route;
   return navigate_to;
 }

@@ -1,7 +1,9 @@
 #include <gtest/gtest.h>
+#include <cmath>
 #include <iostream>
 #include "uas_sim/UAS_structs.h"
 #include "uas_sim/Simulation.h"
+#include "uas_sim/UAS/UAS.h"
 
 namespace UAS_tests {
   TEST(SimulationTests, Test1){
@@ -90,5 +92,57 @@ namespace UAS_tests {
     EXPECT_TRUE(unknown_map_simulation.hasOccupancyGrid());
     
     
+  }
+
+  TEST(SimulationTests, ZeroNoiseGridPlannerMovesTowardMission) {
+    const UAS_operating_constraints constraints{
+      2.0, 5.0, 2.0, 0.5
+    };
+    const std::vector<Waypoint> mission{ { 5.0, 5.0 } };
+    const UAS_state initial_state{ 5.0, 30.0, 5.0, 3.14159265358979323846 };
+    const SimConfig sim_config{ 40.0, 0.1, 2.0 };
+
+    // Empty ground-truth map: any deviation is planner/control behaviour,
+    // not obstacle avoidance.  GPS noise is exactly zero.
+    const ObstacleMap map{ WorldBounds{ 0.0, 0.0, 40.0, 40.0 }, {}, {} };
+    const RoutePlanner planner{ mission, map };
+    const GPSSensor gps_sensor{ 0.0, 0.1, 100.0 };
+    const RangeSensorConfig range_sensor{
+      10.0, 1.57079632679489661923, 0.01, 0.5, 0.5
+    };
+
+    UAS uas{
+      constraints, mission, initial_state, gps_sensor,
+      FollowerMethod::PURE_PURSUIT, planner, range_sensor, true, 1.0
+    };
+
+    KalmanFilterState kalman;
+    kalman.state_estimate.setZero();
+    kalman.P = Eigen::Matrix4d::Identity();
+    kalman.A = Eigen::Matrix4d::Identity();
+    kalman.Q = Eigen::Matrix4d::Zero();
+    kalman.H.setZero();
+    kalman.R = Eigen::Matrix2d::Identity();
+    kalman.K.setZero();
+    uas.initialiseKalman(kalman);
+    uas.setWaypointTolerance(sim_config);
+
+    bool reached_mission = false;
+    for (double time = 0.0; time < sim_config.sim_length; time += sim_config.timestep) {
+      if (uas.step(sim_config, time)) {
+        reached_mission = true;
+        break;
+      }
+    }
+
+    const UAS_state final_state = uas.getTrueState();
+    const double displacement = std::hypot(
+      final_state.x - initial_state.x,
+      final_state.y - initial_state.y
+    );
+
+    EXPECT_GT(displacement, 5.0);
+    EXPECT_LT(final_state.y, initial_state.y - 5.0);
+    EXPECT_TRUE(reached_mission);
   }
 }

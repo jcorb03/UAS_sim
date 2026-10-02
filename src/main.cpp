@@ -12,33 +12,33 @@ int main() {
   //Choose Simulation from SimulationCatalogue()
 
   UAS_operating_constraints constraints{
-     2.0,    // min_speed [m/s]
-     5.0,   // max_speed [m/s]
+     1.0,    // min_speed [m/s]
+     3.0,    // max_speed [m/s]
      2.0,    // max_accel [m/s^2]
      1.0     // max_turn_rate [rad/s]
   };
 
   RoutePlanner planner = Courses::Course1();
-  UAS_state state(10.0, 90.0, 5.0, 3.14);
+  UAS_state state(10.0, 90.0, 3.0, 3.14);
 
   GPSSensor gps_sensor(
-    1,    // noise standard deviation [m]
-    0.1,     // update rate [Hz]
-    5.0
+    0.25,  // position noise standard deviation [m]
+    0.1,   // update period [s]
+    10.0   // time until sensor failure [s]
   );
 
   RangeSensorConfig rsensorconfig{
-    10.0,
+    15.0, // max range [m]
     1.57, // half angle from direction of movement
-    0.01,
-    0.5,
-    0.1
+    0.02, // angular resolution [rad]
+    1.0,  // range resolution [m]
+    0.5   // update period [s]
   };
 
   SimConfig sim_config{
-      190.0,    // sim length [s]
+      300.0,    // sim length [s]
       0.1,   // timestep[s]
-      10.0     // waypoint tolerance [m]
+      5.0      // waypoint tolerance [m]
   };
 
   std::vector<Waypoint> checkpoints{
@@ -57,11 +57,11 @@ int main() {
 
   kalman.A = Eigen::Matrix4d::Identity();
 
-  kalman.Q = Eigen::Matrix4d::Zero();
+  kalman.Q = Eigen::Matrix4d::Identity() * 0.01;
 
   kalman.H.setZero();
 
-  kalman.R = Eigen::Matrix2d::Identity() * 4.0;
+  kalman.R = Eigen::Matrix2d::Identity() * 0.0625;
 
   kalman.K.setZero();
 
@@ -78,7 +78,7 @@ int main() {
     planner,
     kalman,
     NavigationMode::UnknownMap,
-    0.1
+    1.0
   };
 
   Simulation simulation(config);

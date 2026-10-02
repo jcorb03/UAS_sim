@@ -15,7 +15,7 @@ struct GridIndex {
 };
 
 struct Costmap {
-
+    
     std::vector<std::vector<double>> costs;
     WorldBounds bounds;
     double inflation_radius_ = 5.0;

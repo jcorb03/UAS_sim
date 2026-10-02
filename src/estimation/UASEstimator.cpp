@@ -50,21 +50,20 @@ void Estimator::update(UAS_measurement& measurement,
 
   // Second GPS measurement
   if (measurement_count_ == 2 && new_measurement) {
-
-    double dx = measurement.x.value() - estimated_state_.x;
-    double dy = measurement.y.value() - estimated_state_.y;
-
     time_ = sim_time;
-
-    
-    estimated_state_.v =
-      std::sqrt(dx * dx + dy * dy) / (update_period);
-
-    estimated_state_.heading =
-      std::atan2(dx, dy);
 
     estimated_state_.x = measurement.x.value();
     estimated_state_.y = measurement.y.value();
+    // Two independent GPS fixes separated by a short update period are a
+    // very noisy velocity/heading estimate (1 m noise over 0.1 s can imply
+    // a false 10+ m/s motion).  Start these unobserved states from the
+    // commanded motion model instead; later GPS fixes correct position.
+    estimated_state_.v = std::clamp(
+      uas_command.velocity,
+      operating_constraints_.min_speed,
+      operating_constraints_.max_speed
+    );
+    estimated_state_.heading = uas_command.heading;
 
     // Initialise the EKF state
     kalman_.state_estimate <<
@@ -74,7 +73,10 @@ void Estimator::update(UAS_measurement& measurement,
       estimated_state_.heading;
 
     
-    while (estimated_state_.heading < 0.0) {
+    estimated_state_.heading = std::fmod(
+      estimated_state_.heading, 2 * std::numbers::pi
+    );
+    if (estimated_state_.heading < 0.0) {
       estimated_state_.heading += 2 * std::numbers::pi;
     }
     return;
@@ -226,7 +228,10 @@ void Estimator::update(UAS_measurement& measurement,
   estimated_state_.v = kalman_.state_estimate(2);
   estimated_state_.heading = kalman_.state_estimate(3);
 
-  while (estimated_state_.heading < 0.0) {
+  estimated_state_.heading = std::fmod(
+    estimated_state_.heading, 2 * std::numbers::pi
+  );
+  if (estimated_state_.heading < 0.0) {
     estimated_state_.heading += 2 * std::numbers::pi;
   }
   

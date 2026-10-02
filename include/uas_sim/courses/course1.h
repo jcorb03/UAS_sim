@@ -7,13 +7,13 @@ namespace Courses {
   RoutePlanner Course1() {
     WorldBounds bounds{ 0.0,0.0,100.0,100.0 };
 
-    CircleObstacle circle1{ 10.0, 15.0, 3.0 };
+    CircleObstacle circle1{ 20.0, 25.0, 3.0 };
     CircleObstacle circle2{ 20.0, 75.0, 4.0 };
     CircleObstacle circle3{ 50.0, 50.0, 5.0 };
     std::vector<CircleObstacle> circles = { circle1, circle2, circle3 };
 
 
-    RectangleObstacle rectangle1{ 20.0, 20.0, 22.0, 23.0 };
+    RectangleObstacle rectangle1{ 40.0, 20.0, 42.0, 23.0 };
     RectangleObstacle rectangle2{ 65.0, 40.0, 80.0, 48.0 };
     std::vector<RectangleObstacle> rectangles = { rectangle1, rectangle2 };
 

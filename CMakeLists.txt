@@ -46,7 +46,7 @@ add_executable(UAS_Sim
     "src/map/CostMap.cpp" 
     "src/map/OccupancyGrid.cpp" 
     "src/routeplanner/gridplanner.cpp" 
-    )
+     "src/Navigator/UnknownMapNavigator.cpp")
 
 target_include_directories(UAS_Sim
     PRIVATE
@@ -88,7 +88,7 @@ add_executable(UAS_tests
     "src/sensors/RangeSensor.cpp" 
     "src/map/CostMap.cpp"
     "src/map/OccupancyGrid.cpp" 
-    "src/routeplanner/gridplanner.cpp")
+    "src/routeplanner/gridplanner.cpp" "src/Navigator/UnknownMapNavigator.cpp")
 
 target_include_directories(UAS_tests
     PRIVATE

@@ -7,7 +7,12 @@
 
 namespace {
 
-Costmap makeFreeCostmap(std::size_t width = 5, std::size_t height = 5) {
+struct TestMaps {
+  OccupancyGrid occupancy_grid;
+  Costmap costmap;
+};
+
+TestMaps makeFreeMaps(std::size_t width = 5, std::size_t height = 5) {
   OccupancyGrid occupancy_grid{
     WorldBounds{ 0.0, 0.0, static_cast<double>(width),
       static_cast<double>(height) },
@@ -20,16 +25,18 @@ Costmap makeFreeCostmap(std::size_t width = 5, std::size_t height = 5) {
     }
   }
 
-  return Costmap{ occupancy_grid, 0.0 };
+  Costmap costmap{ occupancy_grid, 0.0 };
+  return { std::move(occupancy_grid), std::move(costmap) };
 }
 
 }  // namespace
 
 TEST(GridPlannerTests, FindsPathAcrossFreeCostmap) {
-  const Costmap costmap = makeFreeCostmap();
+  const TestMaps maps = makeFreeMaps();
   GridPlanner planner;
 
-  EXPECT_TRUE(planner.Plan(costmap, { 0, 0 }, { 4, 4 }));
+  EXPECT_FALSE(planner.Plan(maps.occupancy_grid, maps.costmap,
+    { 0, 0 }, { 4, 4 }).empty());
 
   const PlanResult route = planner.GetRoute();
   ASSERT_TRUE(route.found_path);
@@ -41,23 +48,25 @@ TEST(GridPlannerTests, FindsPathAcrossFreeCostmap) {
 }
 
 TEST(GridPlannerTests, RejectsAnUnreachableGoal) {
-  Costmap costmap = makeFreeCostmap();
+  TestMaps maps = makeFreeMaps();
 
-  for (double& cell_cost : costmap.costs.at(1)) {
+  for (double& cell_cost : maps.costmap.costs.at(1)) {
     cell_cost = std::numeric_limits<double>::infinity();
   }
 
   GridPlanner planner;
 
-  EXPECT_FALSE(planner.Plan(costmap, { 0, 0 }, { 4, 4 }));
+  EXPECT_TRUE(planner.Plan(maps.occupancy_grid, maps.costmap,
+    { 0, 0 }, { 4, 4 }).empty());
   EXPECT_FALSE(planner.GetRoute().found_path);
   EXPECT_TRUE(planner.GetRoute().path.empty());
 }
 
 TEST(GridPlannerTests, RejectsAnOutOfBoundsStart) {
-  const Costmap costmap = makeFreeCostmap();
+  const TestMaps maps = makeFreeMaps();
   GridPlanner planner;
 
-  EXPECT_FALSE(planner.Plan(costmap, { -1, 0 }, { 4, 4 }));
+  EXPECT_TRUE(planner.Plan(maps.occupancy_grid, maps.costmap,
+    { -1, 0 }, { 4, 4 }).empty());
   EXPECT_FALSE(planner.GetRoute().found_path);
 }
