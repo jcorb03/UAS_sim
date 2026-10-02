@@ -2,7 +2,7 @@
 
 GridPlanner::GridPlanner() {}
 
-bool GridPlanner::Plan(const Costmap& costmap, GridIndex start, GridIndex goal) {
+bool GridPlanner::PlanAStar(const Costmap& costmap, GridIndex start, GridIndex goal) {
   route_ = {};
 
   if (costmap.costs.empty() || costmap.costs.front().empty()) {
@@ -63,6 +63,7 @@ bool GridPlanner::Plan(const Costmap& costmap, GridIndex start, GridIndex goal) 
     if (node->index.i == goal.i &&
       node->index.j == goal.j) {
       const Node* path_node = node;
+      route_.total_cost = node->g_cost;
 
       while (path_node != nullptr) {
         route_.path.insert(route_.path.begin(), path_node->index);
@@ -163,55 +164,54 @@ bool GridPlanner::FindFrontiers(const OccupancyGrid& occupancy_grid,
     }
   }
   
-  //Create Frontiers
+  bool created = ClusterFrontiers(frontier_cells);
 
+
+  return true;
+}
+
+bool GridPlanner::ClusterFrontiers(std::vector<GridIndex> frontier_cells) {
+  frontiers_.clear();
+  std::vector<GridIndex> visited_cells{};
+  std::vector < std::pair<int, int>> cardinal_ne =
+  { {1,0},{0,-1}, {-1,0}, {0,1} };
+
+  //for every frontier cell
   for (int i = 0; i < frontier_cells.size(); ++i) {
-
-    GridIndex cell{
-      frontier_cells.at(i).i,
-      frontier_cells.at(i).j
-    };
-
-    //Check cell doesn't already belong to a frontier
-    for (Frontier& frontier : frontiers_) {
-      if (std::find(frontier_cells.begin(), frontier_cells.end(), cell)
-        != frontier_cells.end()) {
-        continue;
-      }
+    
+    // check cell hasn't already been visited
+    if (std::find(visited_cells.begin(), visited_cells.end(), frontier_cells.at(i))
+      != visited_cells.end()) {
+      continue;
     }
 
+    Frontier new_frontier{};
+    
+    std::vector<GridIndex> queue = { frontier_cells.at(i) };
+    visited_cells.push_back(frontier_cells.at(i));
+
+    while (!queue.empty()) {
+      GridIndex cell = queue.back();
+      queue.pop_back();
+
+      new_frontier.cells.push_back(cell);
+      
       for (std::pair<int, int>& ne : cardinal_ne) {
-        //Check neighbours
-        
         GridIndex neighbour{
           cell.i + ne.first,
           cell.j + ne.second
         };
 
-        //Check neighbour doesn't already belong to a frontier
-        std::optional<std::size_t> neighbour_frontier_index;
-
-        for (std::size_t i = 0; i < frontiers_.size(); ++i) {
-          const auto& cells = frontiers_.at(i).cells;
-
-          if (std::find(cells.begin(), cells.end(), neighbour) != cells.end()) {
-            neighbour_frontier_index = i;
-            break;
-          }
-        }
-        
-        //Check if it borders another frontier cells
-        if (std::find(frontier_cells.begin(), frontier_cells.end(), neighbour)
-          != frontier_cells.end()) {
-          if (neighbour_frontier_index.has_value()) {
-            frontiers_[*neighbour_frontier_index].cells.push_back(cell);
-          }
+        if (std::find(frontier_cells.begin(), frontier_cells.end(), neighbour) != frontier_cells.end() &&
+          std::find(visited_cells.begin(), visited_cells.end(), neighbour) == visited_cells.end()) {
+          visited_cells.push_back(neighbour);
+          queue.push_back(neighbour);
         }
       }
-    
+    }
+
+    frontiers_.push_back(new_frontier);
   }
-
-
   return true;
 }
 
@@ -224,4 +224,73 @@ double GridPlanner::Heuristic(GridIndex from, GridIndex goal,
 
 PlanResult GridPlanner::GetRoute() const {
   return route_;
+}
+
+GridIndex GridPlanner::NavigateTo(const Costmap& costmap, GridIndex start, GridIndex to) {
+
+  double best_score = -std::numeric_limits<double>::infinity();
+  PlanResult best_route{};
+  GridIndex navigate_to = to;
+
+  for (Frontier& frontier : frontiers_) {
+    
+    if (frontier.cells.empty()) {
+      continue;
+    }
+
+    // Get Centroid of Cluster
+      int centroid_i = std::ceil(std::accumulate(
+        frontier.cells.begin(), frontier.cells.end(), 0.0,
+        [](double sum, const GridIndex& cell) {
+          return sum + cell.i;
+        }
+      ) / frontier.cells.size());
+
+      int centroid_j = std::ceil(std::accumulate(
+        frontier.cells.begin(), frontier.cells.end(), 0.0,
+        [](double sum, const GridIndex& cell) {
+          return sum + cell.j;
+        }
+      ) / frontier.cells.size());
+
+      double closest_distance_sq =
+        std::numeric_limits<double>::infinity();
+
+      GridIndex closest_to_centroid{};
+
+      for (const GridIndex& cell : frontier.cells) {
+        const double di = cell.i - centroid_i;
+        const double dj = cell.j - centroid_j;
+        const double distance_sq = di * di + dj * dj;
+
+        if (distance_sq < closest_distance_sq) {
+          closest_distance_sq = distance_sq;
+          closest_to_centroid = cell;
+        }
+      }
+
+      bool pass = PlanAStar(costmap, start, closest_to_centroid);
+
+      if (!pass) {
+        continue;
+      }
+
+      int information_gain = frontier.cells.size();
+      double cost = route_.total_cost;
+
+      double score = information_gain / (cost + 1e-3) -
+        Heuristic(closest_to_centroid, to, costmap.resolution_);
+      
+      if (score > best_score) {
+        best_score = score;
+        best_route = route_;
+        navigate_to = closest_to_centroid;
+      }
+  };
+  route_ = best_route;
+  return navigate_to;
+}
+
+std::vector<Frontier> GridPlanner::GetFrontiers() const {
+  return frontiers_;
 }

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <utility>
+#include <numeric>
 
 struct PlanResult {
   bool found_path = false;
@@ -28,7 +29,7 @@ struct Node {
 class GridPlanner {
 public:
   GridPlanner();
-  bool Plan(const Costmap& costmap,
+  bool PlanAStar(const Costmap& costmap,
     GridIndex start,
     GridIndex goal);
   bool FindFrontiers(const OccupancyGrid& occupancy_grid,
@@ -36,6 +37,9 @@ public:
   PlanResult GetRoute() const;
   double Heuristic(GridIndex from, GridIndex goal,
     double resolution);
+  bool ClusterFrontiers(std::vector<GridIndex> frontier_cells);
+  std::vector<Frontier> GetFrontiers() const;
+  GridIndex NavigateTo(const Costmap& costmap, GridIndex start, GridIndex to);
 
 private:
   PlanResult route_;
