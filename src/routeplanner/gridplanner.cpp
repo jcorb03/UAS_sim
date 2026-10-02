@@ -2,6 +2,21 @@
 
 GridPlanner::GridPlanner() {}
 
+std::vector<GridIndex> GridPlanner::Plan(const OccupancyGrid& occupancy_grid, 
+  const Costmap& costmap, GridIndex start, GridIndex goal) {
+  bool can_reach_target = PlanAStar(costmap, start, goal);
+
+  if (can_reach_target) {
+    return route_.path;
+  }
+
+  FindFrontiers(occupancy_grid, costmap, start);
+  
+  GridIndex target = NavigateTo(costmap, start, goal);
+
+  return route_.path;
+}
+
 bool GridPlanner::PlanAStar(const Costmap& costmap, GridIndex start, GridIndex goal) {
   route_ = {};
 
@@ -136,10 +151,14 @@ bool GridPlanner::FindFrontiers(const OccupancyGrid& occupancy_grid,
   for (int i = 0; i < occupancy_grid.grid.size(); ++i) {
     for (int j = 0; j < occupancy_grid.grid[0].size(); ++j) {
 
+      GridIndex cell{ i,j };
+
       if (occupancy_grid.getState(i, j) != OccupancyState::Free){
         continue;
       }
-
+      if (!costmap.isTraversable(cell)) {
+        continue;
+      }
       GridIndex cell = { i,j };
       for (std::pair<int, int>& ne : cardinal_ne) {
 
@@ -148,9 +167,14 @@ bool GridPlanner::FindFrontiers(const OccupancyGrid& occupancy_grid,
           j + ne.second
         };
 
-        if (!costmap.isTraversable(neighbour)) {
+        // Do not read outside the occupancy grid.
+        if (neighbour.i < 0 || neighbour.j < 0 ||
+          neighbour.i >= static_cast<int>(occupancy_grid.grid.size()) ||
+          neighbour.j >= static_cast<int>(
+            occupancy_grid.grid.front().size())) {
           continue;
         }
+
         //Frontier Cell Check
         if (occupancy_grid.getState(neighbour.i, neighbour.j) ==
           OccupancyState::Unknown) {
@@ -158,6 +182,7 @@ bool GridPlanner::FindFrontiers(const OccupancyGrid& occupancy_grid,
           if (std::find(frontier_cells.begin(), frontier_cells.end(), cell)
             == frontier_cells.end()) {
             frontier_cells.push_back(cell);
+            break;
           }
         }
       }
@@ -167,7 +192,7 @@ bool GridPlanner::FindFrontiers(const OccupancyGrid& occupancy_grid,
   bool created = ClusterFrontiers(frontier_cells);
 
 
-  return true;
+  return created;
 }
 
 bool GridPlanner::ClusterFrontiers(std::vector<GridIndex> frontier_cells) {

@@ -29,6 +29,8 @@ struct Node {
 class GridPlanner {
 public:
   GridPlanner();
+  std::vector<GridIndex> Plan(const OccupancyGrid& occupancy_grid,
+    const Costmap& costmap, GridIndex start, GridIndex goal);
   bool PlanAStar(const Costmap& costmap,
     GridIndex start,
     GridIndex goal);
