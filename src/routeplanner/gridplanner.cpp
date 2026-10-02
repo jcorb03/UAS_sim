@@ -90,8 +90,6 @@ bool GridPlanner::Plan(const Costmap& costmap, GridIndex start, GridIndex goal) 
         continue;
       }
 
-      
-
         double neighbour_dist = std::sqrt(neighbour_diff.first * neighbour_diff.first +
           neighbour_diff.second * neighbour_diff.second) *costmap.resolution_;
 
@@ -126,10 +124,102 @@ bool GridPlanner::Plan(const Costmap& costmap, GridIndex start, GridIndex goal) 
   return false;
 }
 
+bool GridPlanner::FindFrontiers(const OccupancyGrid& occupancy_grid,
+  const Costmap& costmap, GridIndex from) {
 
-double GridPlanner::Heuristic(GridIndex from, GridIndex goal, double resolution) {
+  frontiers_.clear();
+  std::vector < std::pair<int, int>> cardinal_ne = 
+  { {1,0},{0,-1}, {-1,0}, {0,1} };
+  std::vector<GridIndex> frontier_cells{};
+
+  for (int i = 0; i < occupancy_grid.grid.size(); ++i) {
+    for (int j = 0; j < occupancy_grid.grid[0].size(); ++j) {
+
+      if (occupancy_grid.getState(i, j) != OccupancyState::Free){
+        continue;
+      }
+
+      GridIndex cell = { i,j };
+      for (std::pair<int, int>& ne : cardinal_ne) {
+
+        GridIndex neighbour{
+          i + ne.first,
+          j + ne.second
+        };
+
+        if (!costmap.isTraversable(neighbour)) {
+          continue;
+        }
+        //Frontier Cell Check
+        if (occupancy_grid.getState(neighbour.i, neighbour.j) ==
+          OccupancyState::Unknown) {
+          //needs to be added to a frontier
+          if (std::find(frontier_cells.begin(), frontier_cells.end(), cell)
+            == frontier_cells.end()) {
+            frontier_cells.push_back(cell);
+          }
+        }
+      }
+    }
+  }
+  
+  //Create Frontiers
+
+  for (int i = 0; i < frontier_cells.size(); ++i) {
+
+    GridIndex cell{
+      frontier_cells.at(i).i,
+      frontier_cells.at(i).j
+    };
+
+    //Check cell doesn't already belong to a frontier
+    for (Frontier& frontier : frontiers_) {
+      if (std::find(frontier_cells.begin(), frontier_cells.end(), cell)
+        != frontier_cells.end()) {
+        continue;
+      }
+    }
+
+      for (std::pair<int, int>& ne : cardinal_ne) {
+        //Check neighbours
+        
+        GridIndex neighbour{
+          cell.i + ne.first,
+          cell.j + ne.second
+        };
+
+        //Check neighbour doesn't already belong to a frontier
+        std::optional<std::size_t> neighbour_frontier_index;
+
+        for (std::size_t i = 0; i < frontiers_.size(); ++i) {
+          const auto& cells = frontiers_.at(i).cells;
+
+          if (std::find(cells.begin(), cells.end(), neighbour) != cells.end()) {
+            neighbour_frontier_index = i;
+            break;
+          }
+        }
+        
+        //Check if it borders another frontier cells
+        if (std::find(frontier_cells.begin(), frontier_cells.end(), neighbour)
+          != frontier_cells.end()) {
+          if (neighbour_frontier_index.has_value()) {
+            frontiers_[*neighbour_frontier_index].cells.push_back(cell);
+          }
+        }
+      }
+    
+  }
+
+
+  return true;
+}
+
+double GridPlanner::Heuristic(GridIndex from, GridIndex goal,
+  double resolution) {
   return resolution * (std::max(std::abs(from.i - goal.i), std::abs(from.j - goal.j))
-    + (std::sqrt(2.0) - 1.0) * std::min(std::abs(from.i - goal.i), std::abs(from.j - goal.j)));
+    + (std::sqrt(2.0) - 1.0) * 
+    std::min(std::abs(from.i - goal.i), std::abs(from.j - goal.j)));
 }
 
 PlanResult GridPlanner::GetRoute() const {

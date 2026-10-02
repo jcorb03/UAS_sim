@@ -10,6 +10,12 @@ struct PlanResult {
   double total_cost = 0.0;
 };
 
+struct Frontier {
+  std::vector<GridIndex> cells;
+  GridIndex goal_cell;
+  double information_gain;
+};
+
 struct Node {
   GridIndex index{};
   double g_cost = std::numeric_limits<double>::infinity(); // Cost from start to this node
@@ -25,6 +31,8 @@ public:
   bool Plan(const Costmap& costmap,
     GridIndex start,
     GridIndex goal);
+  bool FindFrontiers(const OccupancyGrid& occupancy_grid,
+    const Costmap& costmap, GridIndex from);
   PlanResult GetRoute() const;
   double Heuristic(GridIndex from, GridIndex goal,
     double resolution);
@@ -34,4 +42,5 @@ private:
   std::vector<std::pair<int,int>> neighbour_diffs_ = 
   { {1,1},{1,0},{1,-1},{0,1},
     {0,-1},{-1,1},{-1,0},{-1,-1} };
+  std::vector<Frontier> frontiers_{};
 };

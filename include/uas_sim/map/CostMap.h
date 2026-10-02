@@ -9,7 +9,9 @@
 // Used for navigation based on the OccupancyGrid
 
 struct GridIndex {
-    int i, j;
+  int i, j;
+
+  bool operator==(const GridIndex&) const = default;
 };
 
 struct Costmap {
