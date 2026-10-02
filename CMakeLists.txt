@@ -42,7 +42,7 @@ add_executable(UAS_Sim
     "src/routeplanner/routeplanner.cpp" 
     "src/map/ObstacleMap.cpp" 
     "include/uas_sim/helperfunctions.h" 
-    "src/sensors/RangeSensor.cpp" "src/map/CostMap.cpp" "src/map/OccupancyGrid.cpp")
+    "src/sensors/RangeSensor.cpp" "src/map/CostMap.cpp" "src/map/OccupancyGrid.cpp" "src/routeplanner/gridplanner.cpp" "tests/planner/grid_planner_test.cpp")
 
 target_include_directories(UAS_Sim
     PRIVATE
@@ -74,13 +74,14 @@ add_executable(UAS_tests
     src/Simulation.cpp
     tests/control/test_guidance.cpp 
     tests/estimation/test_GPS_kalman.cpp 
+    tests/routeplanner/test_gridplanner.cpp
     tests/test_simulation01.cpp 
     src/data/make_csv.cpp 
     "src/UAS/UAS.cpp" 
     "src/routeplanner/routeplanner.cpp" 
     "src/map/ObstacleMap.cpp" 
     "include/uas_sim/helperfunctions.h" 
-    "src/sensors/RangeSensor.cpp" "src/map/CostMap.cpp" "src/map/OccupancyGrid.cpp")
+    "src/sensors/RangeSensor.cpp" "src/map/CostMap.cpp" "src/map/OccupancyGrid.cpp" "src/routeplanner/gridplanner.cpp" "tests/planner/grid_planner_test.cpp")
 
 target_include_directories(UAS_tests
     PRIVATE
