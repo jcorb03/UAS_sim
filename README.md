@@ -2,13 +2,14 @@
 
 Basic 2D UAS/drone simulation platform written in C++.
 
-**Latest update:** v1.3 — Object avoidance
+**Latest update:** v1.4 — Frontier Based A\* Autonomous Navigation
 
 ## Current capabilities
 
-- Waypoint navigation using RRT* path planning and Pure Pursuit path following
+- Preplanned Waypoint navigation using RRT* path planning and Pure Pursuit path following
+- Autonomous Waypoint navigation using Frontier-Based Exploration and A\* Path Planning
 - Configurable GPS sensor noise and update frequency
-- Extended Kalman Filter state estimation
+- Extended Kalman Filter state estimation 
 - Configurable UAS speed, acceleration, and turn-rate limits
 
 ## Future plans
